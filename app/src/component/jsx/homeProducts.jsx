@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css/pagination";
 import "swiper/css/effect-cube";
+import 'swiper/css/effect-cards';
 import "swiper/css";
-import { EffectCube, Pagination, Mousewheel } from "swiper/modules";
+import { EffectCube, Pagination,  EffectCards } from "swiper/modules";
 
 import ProductCard from "./productCard.jsx";
 
@@ -209,6 +210,21 @@ export default function HomeProducts(){
           </SwiperSlide>
         </Swiper>
         </div>
+        {/*<div className="home-products-content cards">
+          <Swiper
+            effect={'cards'}
+            grabCursor={true}
+            modules={[EffectCards]}
+            className="home-products-cards"
+          >
+            <SwiperSlide className="home-products-card">
+              <ProductCard product={product[0]} slide={false}/>
+            </SwiperSlide>
+            <SwiperSlide>
+              <ProductCard product={product[0]} slide={false}/>
+            </SwiperSlide>
+          </Swiper>
+        </div>*/}
       </div>
     </>
   )  

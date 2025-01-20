@@ -77,3 +77,26 @@
     color: #233; /* يعود للون الأول */
   }
 }
+.cards{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:5px;
+  width:100%;
+  margin:auto;
+}
+.home-products-cards{
+  max-width:100vw;
+  box-shadow:none !important;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.home-products-card{
+  box-shadow:none !important;
+  margin-left:100px
+}
+.swiper_slide{
+  box-shadow:none !important;
+}

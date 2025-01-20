@@ -4,6 +4,7 @@
   overflow:hidden;
   position:relative;
   font-family: "Quicksand", serif;
+  border-radius: 6px;  
 }
 .product-card-content{
   width:100%;
