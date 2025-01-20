@@ -50,17 +50,20 @@ export default function BottomHeader({vertical}) {
       setIsProfile(true);
     }
   }, [location]);
-  useEffect(() => {
-      if (vertical) {
-        const timer = setTimeout(() => {
-          setIsSmall(true);
-        }, 5000);
+  useEffect(()=>{
+    if(!isSmall && vertical){
+      const timer = setTimeout(() => {
+        setIsSmall(true);
+      }, 3000);
 
-        return () => clearTimeout(timer);
-      }else{
-        setIsSmall(false);
-      }
-  }, [vertical]);  // This effect will run when `vertical` changes
+      return () => clearTimeout(timer);
+    }
+  },[isSmall])
+  const handleClick = () =>{
+    if(vertical&&isSmall){
+      setIsSmall(false);
+    }
+  }  
 
   const handleHomeClicked = () => {
     setIsHome(true);
@@ -84,7 +87,7 @@ export default function BottomHeader({vertical}) {
   }
   
   return (
-    <div className={`bottom-header ${vertical ? "vertical" : "horizontal"} ${isSmall ? "small" : vertical? "big" : ""}`} onClick={()=>{setIsSmall(false)}}>
+    <div className={`bottom-header ${vertical && !isSmall ? "vertical" : "horizontal"} ${vertical && isSmall  ? "small" : vertical && !isSmall ? "big" : ""}`} onClick={()=>handleClick()}>
       <div className="bottom-header-content">
         <div className={`bottom-header-content-home ${isHome ? "active" : ""} ${vertical ? "vertical" : ""} ${isSmall ? "hide" : ""}`} onClick={handleHomeClicked}>
           <div className="home-icon" dangerouslySetInnerHTML={{ __html: isHome ? HomeActive : HomeIcon }} />

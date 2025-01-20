@@ -7,18 +7,19 @@
   transition: transform 0.3s ease-in-out, width 0.3s ease-in-out, height 0.3s ease-in-out; /* الانتقال لكل الخصائص */
 }
 
-.bottom-header.vertical {
-  animation: vertical 0.3s ease-in-out forwards;
-}
 .bottom-header.horizontal{
   animation: horizontal 0.3s ease-in-out forwards;
 }
-.bottom-header.vertical.small{
+.bottom-header.small{
   animation: small 0.3s ease-in-out forwards;
 }
-.bottom-header.vertical.big{
+.bottom-header.vertical {
+  animation: vertical 0.3s ease-in-out forwards;
+}
+.bottom-header.big{
   animation: big 0.3s ease-in-out forwards;
 }
+
 @keyframes big{
   0%{
     height: 50px;
