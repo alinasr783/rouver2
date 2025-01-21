@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -15,6 +15,9 @@ function CircularIndeterminate() {
 }
 
 export default function Login() {
+  useEffect(() => {
+    window.scrollTo(0, 0); // التمرير إلى أعلى نقطة في الصفحة
+  }, []); // [] لضمان تنفيذها مرة واحدة فقط عند التحميل
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,7 +37,7 @@ export default function Login() {
     try {
       const auth = getAuth(); // الحصول على كائن المصادقة من Firebase
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/home"); // التوجيه إلى الصفحة الرئيسية عند نجاح تسجيل الدخول
+      navigate("/"); // التوجيه إلى الصفحة الرئيسية عند نجاح تسجيل الدخول
     } catch (err) {
       console.error("Error logging in:", err.message);
       setError("Invalid email or password.");

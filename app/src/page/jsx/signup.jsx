@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {supabase} from "../../lib/supabase.js";
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
@@ -23,6 +23,10 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    window.scrollTo(0, 0); // التمرير إلى أعلى نقطة في الصفحة
+  }, []); // [] لضمان تنفيذها مرة واحدة فقط عند التحميل
+
   const handleSubmit = async () => {
     setLoading(true);
     setError("");
@@ -37,7 +41,7 @@ export default function Signup() {
       await createUserWithEmailAndPassword(auth, email, password);
       createUserColumn()
       createIdentityColumn()
-      navigate('/home'); 
+      navigate('/'); 
     } catch (err) {
       if (err.code === 'auth/email-already-in-use') {
         setError("Email already exists.");

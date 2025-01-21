@@ -1,0 +1,119 @@
+.help-content{
+  width: 96vw;
+  overflow: hidden;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap:30px;
+}
+/* تصميم العنصر الأساسي */
+.help-search-input {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.help-search-input-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width:92%;
+}
+
+.help-search-input-content-input {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  border: 1px solid #162D3A;
+  border-radius: 8px;
+  padding: 5px 10px;
+  background-color: #fff;
+  height:35px;
+}
+
+.help-search-input-content-input i {
+  margin-right: 10px;
+  color: #999;
+  margin-left: 10px;
+}
+
+/* حقل الإدخال */
+.help-search-input-content-input input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #111;
+  font-weight: 600;
+  font-family: "Quicksand", serif;
+}
+
+/* زر الإعدادات */
+.help-search-input-content-button {
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #162d3a;
+  color: #fff;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  padding: 5px 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+/* help.css */
+
+/* تنسيق Tabs */
+.custom-tabs {
+  display: flex;
+  justify-content: center;
+  background-color: #f5f5f5; /* لون خلفية للتبويبات */
+}
+
+.custom-tab {
+  flex: 1; /* يجعل كل تبويب يأخذ 50% */
+  text-align: center; /* نص في المنتصف */
+  font-size: 16px;
+  font-weight: bold;
+  max-width: none; /* تعطيل القيود الافتراضية للعرض */
+}
+
+.custom-tab.Mui-selected {
+  color: #1976d2; /* لون النص عند التحديد */
+  border-bottom: 2px solid #1976d2; /* خط تحت التبويب المحدد */
+}
+
+/* help.css */
+
+/* تنسيق Tabs */
+.custom-tabs {
+  display: flex;
+  justify-content: center;
+  background-color: #f5f5f5; /* لون خلفية للتبويبات */
+}
+
+.custom-tab {
+  flex: 1; /* يجعل كل تبويب يأخذ 50% */
+  text-align: center; /* نص في المنتصف */
+  font-size: 16px;
+  font-weight: bold;
+  max-width: none; /* تعطيل القيود الافتراضية للعرض */
+}
+
+.custom-tab.Mui-selected {
+  color: #1976d2; /* لون النص عند التحديد */
+  border-bottom: 2px solid #1976d2; /* خط تحت التبويب المحدد */
+}
+
+/* محتوى التبويبات */
+.tab-content {
+  padding: 20px;
+  background-color: #fff;
+  margin-top: 10px;
+}

@@ -88,7 +88,7 @@ export default function BottomHeader({vertical}) {
   
   return (
     <div className={`bottom-header ${vertical && !isSmall ? "vertical" : "horizontal"} ${vertical && isSmall  ? "small" : vertical && !isSmall ? "big" : ""}`} onClick={()=>handleClick()}>
-      <div className="bottom-header-content">
+      <div className={`bottom-header-content ${vertical && !isSmall ? "vertical" : "horizontal"} ${vertical && isSmall  ? "small" : vertical && !isSmall ? "big" : ""}`}>
         <div className={`bottom-header-content-home ${isHome ? "active" : ""} ${vertical ? "vertical" : ""} ${isSmall ? "hide" : ""}`} onClick={handleHomeClicked}>
           <div className="home-icon" dangerouslySetInnerHTML={{ __html: isHome ? HomeActive : HomeIcon }} />
         </div>

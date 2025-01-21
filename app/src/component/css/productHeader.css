@@ -1,0 +1,49 @@
+.product-header{
+  width:100vw;
+  height:60px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: transparent;
+  z-index:10;
+}
+.product-header-content{
+  width: 94%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+}
+.product-header-content-back{
+  width : 35px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border:1px solid #162d3a;
+  color: #162d3a;
+  border-radius: 50%;
+}
+.product-header-content-title{
+  font-size: 18px;
+  font-weight: 600;
+  font-family: "Quicksand", serif;
+  color : #162d3a;
+}
+.product-header-content-heart{
+  width:30px;
+  height:30px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-radius:50%;
+  background:rgba(255,255,255,0.8);;
+  transition:transform 0.3s ease;
+}
+.product-header-content-heart-icon{
+  width:70%;
+  height:60%;
+  align-self: center;
+  text-align: center;
+}

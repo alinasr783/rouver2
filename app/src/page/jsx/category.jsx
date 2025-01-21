@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React,{useState,useEffect} from "react";
 import { useParams } from "react-router-dom";
 import Header from "../../component/jsx/header.jsx";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -10,8 +10,12 @@ import { EffectCube, Pagination,  EffectCards } from "swiper/modules";
 import ProductCard from "../../component/jsx/productCard.jsx";
 import BottomHeader from "../../component/jsx/bottomHeader.jsx";
 export default function Category(){
-  const [product, setProduct] = useState([{title:"Rouver",price:10,rating:4.5,img:"https://i.ibb.co/VHtV3gP/rouver-high-resolution-logo.png"}]);
+  const [product, setProduct] = useState([{id:1,title:"Rouver",price:10,rating:4.5,img:"https://i.ibb.co/VHtV3gP/rouver-high-resolution-logo.png"}]);
   const { name } = useParams();
+  useEffect(() => {
+    window.scrollTo(0, 0); // التمرير إلى أعلى نقطة في الصفحة
+  }, []); // [] لضمان تنفيذها مرة واحدة فقط عند التحميل
+
   return(
     <>
       <Header title={name}/>

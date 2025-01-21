@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import HomeHeader from "../../component/jsx/homeHeader.jsx";
 import SearchInput from "../../component/jsx/searchInput.jsx";
 import HomeCarousel from "../../component/jsx/homeCarousel.jsx";
@@ -8,6 +8,9 @@ import BottomHeader from "../../component/jsx/bottomHeader.jsx";
 import "../css/home.css";
 export default function Home() {
   const [searchMode, setSearchMode] = useState(false);
+  useEffect(() => {
+    window.scrollTo(0, 0); // التمرير إلى أعلى نقطة في الصفحة
+  }, []); // [] لضمان تنفيذها مرة واحدة فقط عند التحميل
 
   return (
     <div className="home">

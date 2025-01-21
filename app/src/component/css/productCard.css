@@ -78,16 +78,14 @@
   justify-content:center;
   align-items:center;
   border-radius:50%;
-  background:#f7f7f6;
+  background:rgba(255,255,255,0.8);;
   transition:transform 0.3s ease;
-  z-index:1000 !imporant;
 }
-.product-card-content-heart i{
-  font-size:18px;
-  color:#333;
-}
-.product-card-content-heart:hover i{
-  color:red;
+.product-card-content-heart-icon{
+  width:70%;
+  height:60%;
+  align-self: center;
+  text-align: center;
 }
 .product-card-content-sliders{
   z-index:0 !important;

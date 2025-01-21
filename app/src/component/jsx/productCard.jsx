@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { HeartColored } from "./icons";
 import "../css/productCard.css";
 import "swiper/css";
 export default function ProductCard({ product, slide }){
+  const navigate = useNavigate();
   return(
     <>
-      <div className="product-card">
+      <div className="product-card" onClick={()=>{navigate(`/product/${product.id}`)}}>
         <div className="product-card-content">
           <div className="product-card-content-image">
             {slide ?   <Swiper className="product-card-content-sliders">
@@ -38,7 +40,7 @@ export default function ProductCard({ product, slide }){
             <div className="product-card-content-price">${product.price}</div>
           </div>
           <div className="product-card-content-heart">
-            <i className="fa fa-heart"></i>
+            <div className="product-card-content-heart-icon" dangerouslySetInnerHTML={{ __html: HeartColored}}/>
           </div>
         </div>
       </div>

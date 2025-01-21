@@ -12,7 +12,7 @@ import ProductCard from "./productCard.jsx";
 import "../css/homeProducts.css";
 
 export default function HomeProducts(){
-  const [product, setProduct] = useState([{title:"Rouver",price:10,rating:4.5,img:"https://i.ibb.co/VHtV3gP/rouver-high-resolution-logo.png"}]);
+  const [product, setProduct] = useState([{id:1,title:"Rouver",price:10,rating:4.5,img:"https://i.ibb.co/VHtV3gP/rouver-high-resolution-logo.png"}]);
   return(
     <>
       <div className="home-products">

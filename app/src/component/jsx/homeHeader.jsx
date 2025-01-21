@@ -95,7 +95,7 @@ export default function HomeHeader({ searchMode }) {
           {loading ? (
             <Skeleton variant="circular" width={45} height={45} />
           ) : (
-            <div className="home-header-content-notification-bg">
+            <div className="home-header-content-notification-bg" onClick={()=>navigate('/notification')}>
               <Badge
                 badgeContent={5}
                 sx={{
