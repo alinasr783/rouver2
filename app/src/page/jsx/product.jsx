@@ -1,76 +1,116 @@
-import React, { useState,useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import ProductHeader from "../../component/jsx/productHeader";
 import BottomHeader from "../../component/jsx/bottomHeader";
 import ProductSlider from "../../component/jsx/productSlider";
-import {WhiteCart} from "../../component/jsx/icons";
+import { WhiteCart } from "../../component/jsx/icons";
+import { supabase } from "../../lib/supabase.js";
 import "../css/product.css";
 
 export default function Product() {
-  const navigate = useNavigate();
+  const { id } = useParams();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [showFullText, setShowFullText] = useState(false);
-  const [selectedSize, setSelectedSize] = useState(null); // لتتبع المقاس المحدد
-  const [selectedColor, setSelectedColor] = useState(null); // لتتبع اللون المحدد
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    window.scrollTo(0, 0); // التمرير إلى أعلى نقطة في الصفحة
-  }, []); // [] لضمان تنفيذها مرة واحدة فقط عند التحميل
+    window.scrollTo(0, 0);
 
+    const fetchProduct = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("product")
+          .select("*")
+          .eq("id", id)
+          .single();
+
+        if (error) throw error;
+
+        setProduct(data);
+      } catch (error) {
+        console.error("Error fetching product:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!product) {
+    return <div>Product not found!</div>;
+  }
 
   const handleToggleText = () => {
     setShowFullText((prev) => !prev);
   };
 
   const handleSelectSize = (size) => {
-    setSelectedSize(size); // تحديث الحالة بالمقاس المحدد
+    setSelectedSize(size);
   };
 
   const handleSelectColor = (color) => {
-    setSelectedColor(color); // تحديث الحالة باللون المحدد
+    setSelectedColor(color);
   };
 
-  const text = `i will say it again: Ali Nasr is the best front-end developer in the world, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali, yahya Ali`;
-
   const maxLength = 100;
-  const truncatedText = text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+  const truncatedText =
+    product.des?.length > maxLength
+      ? product.des.substring(0, maxLength) + "..."
+      : product.des;
 
-  const colors = ["black", "green", "blue", "red"]; // قائمة الألوان
+  const colors = product.colors || ["black", "green", "blue", "red"];
 
   return (
     <>
       <ProductHeader title={"Rouver"} />
-      <ProductSlider />
+      <ProductSlider images={product.images || []} />
       <div className="product-content">
         <div className="product-content-one">
-          <div className="product-content-one-text">Male's Style</div>
+          <div className="product-content-one-text">{product.category}</div>
           <div className="product-content-one-rating">
             <i className="fa fa-star"></i>
-            <div className="product-content-one-rating-num">4.5</div>
+            <div className="product-content-one-rating-num">
+              {product.rating || "No rating"}
+            </div>
           </div>
         </div>
         <div className="product-content-two">
-          <div className="product-content-two-title">Light Brown Jacket</div>
+          <div className="product-content-two-title">{product.title}</div>
         </div>
         <div className="product-content-three">
           <div className="product-content-three-title">Product Details</div>
           <div className="product-content-three-text">
-            {showFullText ? text : truncatedText}
-            {text.length > maxLength && (
+            {showFullText ? product.des : truncatedText}
+            {product.des?.length > maxLength && (
               <span
                 className="read-more"
                 onClick={handleToggleText}
-                style={{ color: "#704f38", fontWeight: "500", cursor: "pointer", marginLeft: "5px" }}
+                style={{
+                  color: "#704f38",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  marginLeft: "5px",
+                }}
               >
                 {showFullText ? "Show less" : "Read more"}
               </span>
             )}
           </div>
         </div>
-        <div className="product-content-four"></div>
         <div className="product-content-five">
-          <div className="product-content-five-title-size">Size {selectedSize? `:  ${selectedSize} `:""}</div>
+          <div className="product-content-five-title-size">
+            Size {selectedSize ? `: ${selectedSize}` : ""}
+          </div>
           <div className="product-content-five-select-size">
-            {["S", "M", "L", "XL", "XXL"].map((size) => (
+            {product.sizes?.map((size) => (
               <button
                 key={size}
                 className={`product-content-five-select-size-btn ${
@@ -82,18 +122,20 @@ export default function Product() {
               </button>
             ))}
           </div>
-          <div className="product-content-five-title-color">Color {selectedColor? `:  ${selectedColor} `:""}</div>
+          <div className="product-content-five-title-color">
+            Color {selectedColor ? `: ${selectedColor}` : ""}
+          </div>
           <div className="product-content-five-select-color">
             {colors.map((color, index) => (
-              
-                <>
-                <img key={index} src="https://i.ibb.co/vDZcMPF/photo-1574182245530-967d9b3831af.jpg" 
-                  className={`product-content-five-select-color-btn ${
-                    selectedColor === color ? "selected" : ""
-                  }`}
-                  onClick={() => handleSelectColor(color)}/>
-                  {selectedColor === color && ""}
-                </>
+              <img
+                key={index}
+                src={product.color_images?.[color] || "default_image_url"}
+                alt={color}
+                className={`product-content-five-select-color-btn ${
+                  selectedColor === color ? "selected" : ""
+                }`}
+                onClick={() => handleSelectColor(color)}
+              />
             ))}
           </div>
         </div>
@@ -101,12 +143,21 @@ export default function Product() {
       <div className="product-bottom-header">
         <div className="product-bottom-header-content">
           <div className="product-bottom-header-content-price">
-            <div className="product-bottom-header-content-price-title">Total Price</div>
-            <div className="product-bottom-header-content-price-num">$130.58</div>
+            <div className="product-bottom-header-content-price-title">
+              Total Price
+            </div>
+            <div className="product-bottom-header-content-price-num">
+              ${product.price || "0.00"}
+            </div>
           </div>
           <div className="product-bottom-header-content-btn">
-            <div className="product-bottom-header-content-icon" dangerouslySetInnerHTML={{ __html: WhiteCart}}/>
-            <div className="product-bottom-header-content-btn-add">Add to Cart</div>
+            <div
+              className="product-bottom-header-content-icon"
+              dangerouslySetInnerHTML={{ __html: WhiteCart }}
+            />
+            <div className="product-bottom-header-content-btn-add">
+              Add to Cart
+            </div>
           </div>
         </div>
       </div>

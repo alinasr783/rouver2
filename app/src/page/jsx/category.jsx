@@ -1,228 +1,98 @@
-import React,{useState,useEffect} from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import Skeleton from "@mui/material/Skeleton";
 import Header from "../../component/jsx/header.jsx";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css/pagination";
-import "swiper/css/effect-cube";
-import 'swiper/css/effect-cards';
-import "swiper/css";
-import { EffectCube, Pagination,  EffectCards } from "swiper/modules";
 import ProductCard from "../../component/jsx/productCard.jsx";
 import BottomHeader from "../../component/jsx/bottomHeader.jsx";
-export default function Category(){
-  const [product, setProduct] = useState([{id:1,title:"Rouver",price:10,rating:4.5,img:"https://i.ibb.co/VHtV3gP/rouver-high-resolution-logo.png"}]);
-  const { name } = useParams();
-  useEffect(() => {
-    window.scrollTo(0, 0); // التمرير إلى أعلى نقطة في الصفحة
-  }, []); // [] لضمان تنفيذها مرة واحدة فقط عند التحميل
+import { supabase } from "../../lib/supabase.js";
 
-  return(
+export default function Category() {
+  const { id } = useParams(); // جلب category_id من الرابط
+  const [products, setProducts] = useState([]);
+  const [categoryName, setCategoryName] = useState("");
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo(0, 0); // تمرير الصفحة لأعلاها عند تحميل المكون
+
+    // جلب بيانات الفئة والمنتجات
+    const fetchCategoryData = async () => {
+      if (!id) {
+        console.error("Category ID is missing");
+        return;
+      }
+
+      try {
+        // جلب اسم الفئة
+        const { data: categoryData, error: categoryError } = await supabase
+          .from("category")
+          .select("name")
+          .eq("id", id)
+          .single();
+
+        if (categoryError) throw categoryError;
+
+        setCategoryName(categoryData.name);
+
+        // جلب المنتجات المرتبطة بـ category_id
+        const { data: productsData, error: productsError } = await supabase
+          .from("product")
+          .select("*")
+          .eq("category", id);
+
+        if (productsError) throw productsError;
+
+        setProducts(productsData);
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+      } finally {
+        setLoading(false); // إنهاء التحميل
+      }
+    };
+
+    fetchCategoryData();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <>
+        <Header title="Loading..." />
+        <div className="home-products">
+          <div className="home-products-content">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <Skeleton
+                key={index}
+                variant="rectangular"
+                width="43%"
+                height={170}
+                style={{ margin: "10px" }}
+              />
+            ))}
+          </div>
+        </div>
+        <BottomHeader />
+      </>
+    );
+  }
+
+  return (
     <>
-      <Header title={name}/>
+      <Header title={categoryName || `Category ${id}`} />
       <div className="home-products">
-        <div className="home-products-content">
-        <ProductCard product={product[0]} slide={true}/>
-        <ProductCard product={product[0]} slide={true}/>
-        <ProductCard product={product[0]} slide={true}/>
-        <ProductCard product={product[0]} slide={true}/>
-        </div>
-        <div className="home-products-content">
-        <Swiper
-          effect="cube"
-          grabCursor
-          cubeEffect={{
-            shadow: false,
-            slideShadows: false,
-            shadowOffset: 20,
-            shadowScale: 0.94,
-          }}
-          modules={[EffectCube]}
-          className="home-products-cube"
-        >
-          <SwiperSlide>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-          </SwiperSlide>
-        </Swiper>
-        </div>
-        <div className="home-products-content">
-        <ProductCard product={product[0]} slide={true}/>
-        <ProductCard product={product[0]} slide={true}/>
-        <ProductCard product={product[0]} slide={true}/>
-        <ProductCard product={product[0]} slide={true}/>
-        </div>
-        <div className="home-products-content">
-        <Swiper slidesPerView={2}
-          spaceBetween={30}
-          centeredSlides={true}
-          className="home-products-swiper"
-        >
-          <SwiperSlide>
-            <ProductCard product={product[0]}/>
-          </SwiperSlide>
-          <SwiperSlide>
-            <ProductCard product={product[0]}/>
-          </SwiperSlide>
-          <SwiperSlide>
-            <ProductCard product={product[0]}/>
-          </SwiperSlide>
-          <SwiperSlide>
-            <ProductCard product={product[0]}/>
-          </SwiperSlide>
-          <SwiperSlide>
-            <ProductCard product={product[0]}/>
-          </SwiperSlide>
-          <SwiperSlide>
-            <ProductCard product={product[0]}/>
-          </SwiperSlide>
-          <SwiperSlide>
-            <ProductCard product={product[0]}/>
-          </SwiperSlide>
-          <SwiperSlide>
-            <ProductCard product={product[0]}/>
-          </SwiperSlide>
-          <SwiperSlide>
-            <ProductCard product={product[0]}/>
-          </SwiperSlide>
-          <SwiperSlide>
-            <ProductCard product={product[0]}/>
-          </SwiperSlide>
-        </Swiper>
-        </div>
-        <div className="home-products-content">
-        <ProductCard product={product[0]} slide={true}/>
-        <ProductCard product={product[0]} slide={true}/>
-        <ProductCard product={product[0]} slide={true}/>
-        <ProductCard product={product[0]} slide={true}/>
-        </div>
-        <div className="home-products-content">
-        <Swiper
-          effect="cube"
-          grabCursor
-          cubeEffect={{
-            shadow: false,
-            slideShadows: false,
-            shadowOffset: 20,
-            shadowScale: 0.94,
-          }}
-          modules={[EffectCube]}
-          className="home-products-cube"
-        >
-          <SwiperSlide>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-            <div className="flex">
-              <ProductCard product={product[0]}/>
-              <ProductCard product={product[0]}/>
-            </div>
-          </SwiperSlide>
-        </Swiper>
-        </div>
-        {/*<div className="home-products-content cards">
-          <Swiper
-            effect={'cards'}
-            grabCursor={true}
-            modules={[EffectCards]}
-            className="home-products-cards"
-          >
-            <SwiperSlide className="home-products-card">
-              <ProductCard product={product[0]} slide={false}/>
-            </SwiperSlide>
-            <SwiperSlide>
-              <ProductCard product={product[0]} slide={false}/>
-            </SwiperSlide>
-          </Swiper>
-        </div>*/}
+        {products.length > 0 ? (
+          <div className="home-products-content">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+      <div>
+        No products found in this category.
+      </div>
+        )}
       </div>
       <BottomHeader />
     </>
-  )
+  );
 }

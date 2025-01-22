@@ -1,87 +1,67 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { supabase } from "../../lib/supabase.js";
+import Skeleton from '@mui/material/Skeleton';
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/effect-cube";
 import "../css/homeCarousel.css";
-import { EffectCube, Pagination, Mousewheel } from "swiper/modules";
+import { EffectCube, Pagination } from "swiper/modules";
 
 export default function HomeCarousel() {
+  const navigate = useNavigate();
+  const [sliders, setSliders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const getSliders = async () => {
+    const { data, error } = await supabase.from("slider").select("*");
+
+    if (error) {
+      console.error("Error fetching sliders:", error);
+    } else {
+      setSliders(data);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getSliders();
+  }, []);
+
   return (
     <div className="home-carousel">
       <div className="home-carousel-content">
-        <Swiper
-          effect="cube"
-          grabCursor
-          cubeEffect={{
-            shadow: false,
-            slideShadows: false,
-            shadowOffset: 20,
-            shadowScale: 0.94,
-          }}
-          pagination={{
-            clickable: true,
-            dynamicBullets: true,
-          }}
-          modules={[EffectCube, Pagination]}
-          className="home-carousel-content-swiper"
-        >
-          <SwiperSlide>
-            <img
-              src="https://i.ibb.co/vDZcMPF/photo-1574182245530-967d9b3831af.jpg"
-              alt="Slide 1"
-              className="home-carousel-img"
-            />
-          </SwiperSlide>
-          <SwiperSlide>
-            <Swiper
-              direction={'vertical'}
-              effect="cube"
-              grabCursor
-              cubeEffect={{
-                shadow: false,
-                slideShadows: false,
-                shadowOffset: 20,
-                shadowScale: 0.94,
-              }}
-              pagination={{
-                clickable: true,
-                dynamicBullets: true,
-              }}
-              modules={[EffectCube ,Mousewheel, Pagination]}
-              className="home-carousel-content-swiper"
-            >
-              <SwiperSlide>
+        {loading ? (
+          <Skeleton variant="rounded" width="98%" height={230} />
+        ) : (
+          <Swiper
+            effect="cube"
+            grabCursor
+            cubeEffect={{
+              shadow: false,
+              slideShadows: false,
+              shadowOffset: 20,
+              shadowScale: 0.94,
+            }}
+            pagination={{
+              clickable: true,
+              dynamicBullets: true,
+            }}
+            modules={[EffectCube, Pagination]}
+            className="home-carousel-content-swiper"
+          >
+            {sliders.map((slider, index) => (
+              <SwiperSlide key={index} onClick={()=>{navigate(`/${slider.link}`)}}>
                 <img
-                  src="https://i.ibb.co/vDZcMPF/photo-1574182245530-967d9b3831af.jpg"
-                  alt="Slide 3"
+                  src={slider.image} // استخدم الحقل الذي يحتوي على رابط الصورة
+                  alt={`Slide ${index + 1}`}
                   className="home-carousel-img"
                 />
               </SwiperSlide>
-              <SwiperSlide>
-                <img
-                  src="https://i.ibb.co/vDZcMPF/photo-1574182245530-967d9b3831af.jpg"
-                  alt="Slide 3"
-                  className="home-carousel-img"
-                />
-              </SwiperSlide>
-              <SwiperSlide>
-                <img
-                  src="https://i.ibb.co/vDZcMPF/photo-1574182245530-967d9b3831af.jpg"
-                  alt="Slide 3"
-                  className="home-carousel-img"
-                />
-              </SwiperSlide>
-            </Swiper>
-          </SwiperSlide>
-          <SwiperSlide>
-            <img
-              src="https://i.ibb.co/vDZcMPF/photo-1574182245530-967d9b3831af.jpg"
-              alt="Slide 3"
-              className="home-carousel-img"
-            />
-          </SwiperSlide>
-        </Swiper>
+            ))}
+          </Swiper>
+        )}
       </div>
     </div>
   );

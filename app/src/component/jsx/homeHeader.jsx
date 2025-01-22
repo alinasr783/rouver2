@@ -12,6 +12,7 @@ export default function HomeHeader({ searchMode }) {
   const [name, setName] = useState("");
   const [greeting, setGreeting] = useState("");
   const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);  // عدد الإشعارات غير المقروءة
   const navigate = useNavigate();
 
   const getGreeting = () => {
@@ -59,12 +60,27 @@ export default function HomeHeader({ searchMode }) {
     }
   };
 
+  const getUnreadNotificationsCount = async (userEmail) => {
+    try {
+      const { count, error } = await supabase
+        .from("notification")
+        .select("id", { count: 'exact' })
+        .eq("email", userEmail)
+        .eq("is_read", false);  // تصفية الإشعارات غير المقروءة فقط
+      if (error) throw error;
+      setUnreadCount(count);
+    } catch (error) {
+      console.error("Error fetching unread notifications count:", error.message);
+    }
+  };
+
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setEmail(user.email);
         getName(user.email);
+        getUnreadNotificationsCount(user.email);  // جلب عدد الإشعارات غير المقروءة
       } else {
         setEmail(null);
         setName("");
@@ -95,9 +111,9 @@ export default function HomeHeader({ searchMode }) {
           {loading ? (
             <Skeleton variant="circular" width={45} height={45} />
           ) : (
-            <div className="home-header-content-notification-bg" onClick={()=>navigate('/notification')}>
+            <div className="home-header-content-notification-bg" onClick={() => navigate('/notification')}>
               <Badge
-                badgeContent={5}
+                badgeContent={unreadCount}
                 sx={{
                   "& .MuiBadge-badge": { color: "#f4f4f4", backgroundColor: "#37474f" },
                 }}
