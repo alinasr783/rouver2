@@ -1,3 +1,4 @@
+import Skeleton from "@mui/material/Skeleton";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ProductHeader from "../../component/jsx/productHeader";
@@ -5,6 +6,7 @@ import BottomHeader from "../../component/jsx/bottomHeader";
 import ProductSlider from "../../component/jsx/productSlider";
 import { WhiteCart } from "../../component/jsx/icons";
 import { supabase } from "../../lib/supabase.js";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import "../css/product.css";
 
 export default function Product() {
@@ -14,6 +16,8 @@ export default function Product() {
   const [showFullText, setShowFullText] = useState(false);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [isProductInCart, setIsProductInCart] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,8 +44,112 @@ export default function Product() {
     fetchProduct();
   }, [id]);
 
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setEmail(user.email);
+      } else {
+        setEmail(null);
+        navigate("/login");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
+
+  useEffect(() => {
+    const checkProductInCart = async () => {
+      if (selectedSize && selectedColor && email) {
+        try {
+          const { data: cartData, error: cartError } = await supabase
+            .from("cart")
+            .select("products")
+            .eq("email", email)
+            .single();
+
+          if (cartError) throw cartError;
+
+          const isInCart = cartData?.products?.some(
+            (product) =>
+              product.size === selectedSize &&
+              product.color === selectedColor &&
+              product.id === id
+          );
+
+          setIsProductInCart(isInCart);
+        } catch (error) {
+          console.error("Error checking cart:", error.message);
+        }
+      }
+    };
+
+    checkProductInCart();
+  }, [selectedSize, selectedColor, email, id]);
+
+  const handleAddToCart = async () => {
+    if (selectedColor && selectedSize && email) {
+      const productDetails = {
+        id: product.id,
+        img: product.images[0],
+        title: product.title,
+        size: selectedSize,
+        color: selectedColor,
+        price: product.price,
+        count: 1,
+      };
+
+      try {
+        const { data: cartData, error: cartError } = await supabase
+          .from("cart")
+          .select("products")
+          .eq("email", email)
+          .single();
+
+        if (cartError) throw cartError;
+
+        let currentProducts = cartData?.products || [];
+
+        const isInCart = currentProducts.some(
+          (item) =>
+            item.id === productDetails.id &&
+            item.size === productDetails.size &&
+            item.color === productDetails.color
+        );
+
+        if (isInCart) {
+          console.log("The product is already in the cart");
+          setIsProductInCart(true);
+          return;
+        }
+
+        currentProducts.push(productDetails);
+
+        const { error: updateError } = await supabase
+          .from("cart")
+          .update({ products: currentProducts })
+          .eq("email", email);
+
+        if (updateError) throw updateError;
+
+        console.log("Product added to cart successfully");
+        setIsProductInCart(true);
+      } catch (error) {
+        console.error("Error updating cart:", error.message);
+      }
+    }
+  };
+
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div>
+        <Skeleton variant="text" width="100%" height={40} />
+        <Skeleton variant="rectangular" width="100%" height={300} />
+        <Skeleton variant="text" width="80%" height={20} />
+        <Skeleton variant="text" width="50%" height={20} />
+        <Skeleton variant="rectangular" width="100%" height={60} />
+      </div>
+    );
   }
 
   if (!product) {
@@ -66,7 +174,7 @@ export default function Product() {
       ? product.des.substring(0, maxLength) + "..."
       : product.des;
 
-  const colors = product.colors || ["black", "green", "blue", "red"];
+  const colors = product.colors || [];
 
   return (
     <>
@@ -127,41 +235,69 @@ export default function Product() {
           </div>
           <div className="product-content-five-select-color">
             {colors.map((color, index) => (
-              <img
+              <div
                 key={index}
-                src={product.color_images?.[color] || "default_image_url"}
-                alt={color}
-                className={`product-content-five-select-color-btn ${
-                  selectedColor === color ? "selected" : ""
+                className={`color-box ${
+                  selectedColor === color.color ? "selected" : ""
                 }`}
-                onClick={() => handleSelectColor(color)}
-              />
+                onClick={() => handleSelectColor(color.color)}
+              >
+                <img className="color-box-img" src={color.url} alt="Color" />
+              </div>
             ))}
           </div>
         </div>
       </div>
-      <div className="product-bottom-header">
-        <div className="product-bottom-header-content">
-          <div className="product-bottom-header-content-price">
-            <div className="product-bottom-header-content-price-title">
-              Total Price
-            </div>
-            <div className="product-bottom-header-content-price-num">
-              ${product.price || "0.00"}
-            </div>
-          </div>
-          <div className="product-bottom-header-content-btn">
-            <div
-              className="product-bottom-header-content-icon"
-              dangerouslySetInnerHTML={{ __html: WhiteCart }}
-            />
-            <div className="product-bottom-header-content-btn-add">
-              Add to Cart
-            </div>
+      {selectedColor && selectedSize && (
+
+        <div className="product-bottom-header">
+          <div className="product-bottom-header-content">
+            {isProductInCart ? (
+              <>
+                <div className="product-bottom-header-content-price-title already-in-cart">
+                  Already in Cart
+                </div>
+                <div
+                  className="product-bottom-header-content-btn"
+                  onClick={() => navigate("/cart")}
+                >
+                  <div
+                    className="product-bottom-header-content-icon"
+                    dangerouslySetInnerHTML={{ __html: WhiteCart }}
+                  />
+                  <div className="product-bottom-header-content-btn-add">
+                    Go to Cart
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="product-bottom-header-content-price">
+                  <div className="product-bottom-header-content-price-title">
+                    Total Price
+                  </div>
+                  <div className="product-bottom-header-content-price-num">
+                    ${product.price || "0.00"}
+                  </div>
+                </div>
+                <div
+                  className="product-bottom-header-content-btn"
+                  onClick={()=>{handleAddToCart()}}
+                >
+                  <div
+                    className="product-bottom-header-content-icon"
+                    dangerouslySetInnerHTML={{ __html: WhiteCart }}
+                  />
+                  <div className="product-bottom-header-content-btn-add">
+                    Add to Cart
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
-      </div>
-      <BottomHeader vertical={true} />
+      )}
+      <BottomHeader vertical={selectedColor&&selectedSize} />
     </>
   );
 }
