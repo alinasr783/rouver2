@@ -64,7 +64,7 @@ export default function HomeProducts() {
           <>
             <div className="home-products-title">Products</div>
             <div className="home-products-content">
-              <ProductCard product={product[0]} slide={true} />
+              <ProductCard product={product[0]} slide={true} /> 
               <ProductCard product={product[1]} slide={true} />
               <ProductCard product={product[2]} slide={true} />
               <ProductCard product={product[3]} slide={true} />

@@ -23,25 +23,36 @@ export default function Product() {
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    const fetchProduct = async () => {
+    const fetchAndUpdateProduct = async () => {
       try {
-        const { data, error } = await supabase
+        // جلب بيانات المنتج من Supabase
+        const { data: productData, error: fetchError } = await supabase
           .from("product")
           .select("*")
           .eq("id", id)
           .single();
 
-        if (error) throw error;
+        if (fetchError) throw fetchError;
 
-        setProduct(data);
+        setProduct(productData);
+
+        // زيادة عدد المشاهدين
+        const updatedViewerCount = (productData.viewer || 0) + 1;
+
+        const { error: updateError } = await supabase
+          .from("product")
+          .update({ viewer: updatedViewerCount })
+          .eq("id", id);
+
+        if (updateError) throw updateError;
       } catch (error) {
-        console.error("Error fetching product:", error.message);
+        console.error("Error fetching or updating product:", error.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProduct();
+    fetchAndUpdateProduct();
   }, [id]);
 
   useEffect(() => {
@@ -87,6 +98,7 @@ export default function Product() {
     checkProductInCart();
   }, [selectedSize, selectedColor, email, id]);
 
+
   const handleAddToCart = async () => {
     if (selectedColor && selectedSize && email) {
       const productDetails = {
@@ -100,6 +112,7 @@ export default function Product() {
       };
 
       try {
+        // جلب السلة من Supabase
         const { data: cartData, error: cartError } = await supabase
           .from("cart")
           .select("products")
@@ -110,6 +123,7 @@ export default function Product() {
 
         let currentProducts = cartData?.products || [];
 
+        // التحقق إذا كان المنتج موجودًا بالفعل في السلة
         const isInCart = currentProducts.some(
           (item) =>
             item.id === productDetails.id &&
@@ -123,6 +137,7 @@ export default function Product() {
           return;
         }
 
+        // إضافة المنتج إلى السلة
         currentProducts.push(productDetails);
 
         const { error: updateError } = await supabase
@@ -134,8 +149,28 @@ export default function Product() {
 
         console.log("Product added to cart successfully");
         setIsProductInCart(true);
+
+        // زيادة عدد مرات الإضافة إلى السلة (added_cart)
+        const { data: productData, error: fetchError } = await supabase
+          .from("product")
+          .select("added_cart")
+          .eq("id", product.id)
+          .single();
+
+        if (fetchError) throw fetchError;
+
+        const updatedAddedCartCount = (productData.added_cart || 0) + 1;
+
+        const { error: updateCartCountError } = await supabase
+          .from("product")
+          .update({ added_cart: updatedAddedCartCount })
+          .eq("id", product.id);
+
+        if (updateCartCountError) throw updateCartCountError;
+
+        console.log("Product added_cart count updated successfully");
       } catch (error) {
-        console.error("Error updating cart:", error.message);
+        console.error("Error updating cart or added_cart count:", error.message);
       }
     }
   };

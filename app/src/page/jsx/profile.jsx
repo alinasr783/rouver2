@@ -1,23 +1,64 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAuth, signOut } from "firebase/auth"; // استيراد الدوال اللازمة من Firebase
+import { supabase } from "../../lib/supabase.js";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth"; // إضافة onAuthStateChanged
 import BottomHeader from "../../component/jsx/bottomHeader.jsx";
 import Header from "../../component/jsx/header.jsx";
-import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 import "../css/profile.css";
 
 function CircularIndeterminate() {
   return (
-    <Box sx={{ display: 'flex', color: '#704f38' }}>
-      <CircularProgress sx={{ color: '#704f38' }} size={20} />
+    <Box sx={{ display: "flex", color: "#704f38" }}>
+      <CircularProgress sx={{ color: "#704f38" }} size={20} />
     </Box>
   );
 }
 
 export default function Profile() {
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState(null); // البريد الإلكتروني للمستخدم
+  const [fullName, setFullName] = useState(""); // تخزين الاسم الكامل
   const navigate = useNavigate();
+
+  // جلب البريد الإلكتروني للمستخدم عند تسجيل الدخول
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setEmail(user.email);
+      } else {
+        setEmail(null);
+        navigate("/login");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
+
+  // جلب بيانات المستخدم من Supabase
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (email) {
+        try {
+          const { data, error } = await supabase
+            .from("identity") // اسم الجدول
+            .select("fullName") // تحديد الحقل المطلوب
+            .eq("email", email)
+            .single();
+
+          if (error) throw error;
+
+          setFullName(data.fullName); // تحديث الاسم
+        } catch (error) {
+          console.error("Error fetching user data:", error.message);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [email]);
 
   // دالة تسجيل الخروج
   const handleLogout = () => {
@@ -47,14 +88,16 @@ export default function Profile() {
           <div className="profile-content-one-img">
             <img
               src="https://i.ibb.co/b5DmQ0D/IMG-20241105-WA0030.jpg"
-              alt="Ali Nasr"
+              alt={fullName || "Profile"}
               className="profile-img"
             />
           </div>
-          <div className="profile-content-one-text">Ali Nasr</div>
+          <div className="profile-content-one-text">
+            {fullName || "Loading..."}
+          </div>
         </div>
         <ul className="menu">
-          <li className="menu-item" onClick={()=>navigate("/profile/edit")}>
+          <li className="menu-item" onClick={() => navigate("/profile/edit")}>
             <div>
               <i className="fas fa-user"></i>
               Edit profile

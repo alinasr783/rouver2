@@ -107,7 +107,7 @@ export default function Cart() {
       console.error("Unexpected error:", err.message);
     }
   };
-
+   
   // حذف منتج
   const deleteItem = async (id) => {
     const updatedProducts = products.filter((item) => item.id !== id);
