@@ -1,0 +1,83 @@
+*{
+  font-family: "Quicksand", sans-serif;
+}
+.checkout-content{
+  width:94vw;
+  margin:auto;
+  
+}
+.checkout-content-items-content-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background-color: #ffffff; /* خلفية بيضاء نظيفة */
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.checkout-content-items-content-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.checkout-content-items-content-item img {
+  width: 80px;
+  height: 70px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid #dcdcdc;
+}
+
+.checkout-item-details {
+  flex: 1;
+  margin-left: 15px;
+  text-align: left;
+}
+
+.checkout-item-details h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #162D3A; /* لون النص الرئيسي */
+  font-weight: bold;
+}
+
+.checkout-item-details p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #8a8a8a;
+}
+
+.checkout-item-details .price {
+  font-size: 14px;
+  color: #162D3A; /* لون أزرق داكن فاتح */
+  font-weight: 600;
+}
+
+.empty-checkout {
+  text-align: center;
+  margin: 50px 0;
+  font-size: 20px;
+  color: #999;
+  font-weight: bold;
+}
+.change-btn {
+  background: none;
+  color: #704f38;
+  border-radius:20px ;
+  border: 1px solid #704f38;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-top: 30px;
+}
+
+.choose-address-title{
+  font-size: 20px;
+  font-weight: 500;
+  color: #162D3A;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}

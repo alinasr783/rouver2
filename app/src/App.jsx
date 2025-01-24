@@ -15,6 +15,7 @@ import Help from './page/jsx/help.jsx';
 import Address from './page/jsx/address.jsx';
 import Checkout from './page/jsx/checkout.jsx';
 import EditProfile from './page/jsx/editProfile.jsx';
+import NewAddress from './page/jsx/newAddress.jsx';
 function App() {
   return (
       <Routes>
@@ -34,6 +35,7 @@ function App() {
         <Route path="/profile/help" element={<Help />} />
         <Route path="/profile/address" element={<Address />} />
         <Route path="/profile/edit" element={<EditProfile />} />
+        <Route path="/new-address" element={<NewAddress />} />
       </Routes>
   );
 }

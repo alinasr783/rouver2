@@ -94,7 +94,7 @@ export default function Cart() {
   };
 
   const handleProceedToCheckout = () => {
-    navigate("/checkout");
+    navigate("/checkout", { state: { products } }); // تمرير المنتجات إلى صفحة Checkout عبر state
   };
 
   return (
