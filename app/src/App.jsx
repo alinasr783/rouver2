@@ -13,6 +13,7 @@ import Settings from './page/jsx/settings.jsx';
 import Privacy from './page/jsx/privacy.jsx';
 import Help from './page/jsx/help.jsx';
 import Address from './page/jsx/address.jsx';
+import Checkout from './page/jsx/checkout.jsx';
 import EditProfile from './page/jsx/editProfile.jsx';
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/orders" element={<Orders />} />
+        <Route path="/checkout" element={<Checkout />} />
         <Route path="/product/:id" element={<Product />} />
         <Route path="/notification" element={<Notification />} />
         <Route path="/profile/settings" element={<Settings />} />

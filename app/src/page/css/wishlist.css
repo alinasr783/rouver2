@@ -18,3 +18,11 @@
   flex-wrap:wrap;
   gap: 5px;
 }
+.empty-wishlist {
+  text-align: center;
+  margin: 50px 0;
+  font-size: 20px;
+  color: #999;
+  font-weight: bold;
+  font-family: "Quicksand", sans-serif;
+}

@@ -9,11 +9,12 @@ import "../css/productCard.css";
 import "swiper/css";
 
 export default function ProductCard({ product, slide }) {
-  const [love, setLove] = useState(false); // لمعرفة إذا كان المنتج في الـ wishlist
-  const [email, setEmail] = useState(null); // حفظ البريد الإلكتروني للمستخدم
-  const [loading, setLoading] = useState(true); // حالة التحميل
+  const [love, setLove] = useState(false);
+  const [email, setEmail] = useState(null); 
+  const [loading, setLoading] = useState(true); 
   const navigate = useNavigate();
 
+  // get user email
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -27,7 +28,7 @@ export default function ProductCard({ product, slide }) {
 
     return () => unsubscribe();
   }, [navigate]);
-
+  // check if user loved the product
   const checkWishlist = useCallback(async () => {
     if (!email) return;
 
@@ -40,7 +41,6 @@ export default function ProductCard({ product, slide }) {
 
       if (error) throw error;
 
-      // تحقق إذا كان المنتج موجودًا
       setLove(data.products.includes(product.id));
     } catch (error) {
       console.error("Error checking wishlist:", error.message);
@@ -49,11 +49,30 @@ export default function ProductCard({ product, slide }) {
     }
   }, [email, product.id]);
 
+  useEffect(() => {
+    checkWishlist();
+  }, [checkWishlist]);
+  
+  const handleHeart = async (e) => {
+    e.stopPropagation(); // منع التنقل للصفحة عند الضغط على القلب
+
+    // تغيير الحالة مباشرة
+    setLove((prevLove) => !prevLove);
+
+    try {
+      // تحديث الـ wishlist
+      await updateWishlist();
+    } catch (error) {
+      console.error("Error updating wishlist:", error.message);
+      // لو في خطأ، رجع الحالة الأصلية
+      setLove((prevLove) => !prevLove);
+    }
+  };
+
   const updateWishlist = useCallback(async () => {
     if (!email) return;
 
     try {
-      // جلب المنتجات الحالية في قائمة الأمنيات
       const { data, error } = await supabase
         .from("wishlist")
         .select("products")
@@ -62,10 +81,9 @@ export default function ProductCard({ product, slide }) {
 
       if (error) throw error;
 
-      // تحديث المنتجات في قائمة الأمنيات بناءً على حالة "love"
       const updatedProducts = love
-        ? data.products.filter((id) => id !== product.id)
-        : [...data.products, product.id];
+        ? data.products.filter((id) => id !== product.id) // إزالة المنتج من الـ wishlist
+        : [...data.products, product.id]; // إضافة المنتج
 
       const { error: updateError } = await supabase
         .from("wishlist")
@@ -76,8 +94,8 @@ export default function ProductCard({ product, slide }) {
 
       console.log("Wishlist updated successfully");
 
-      // **زيادة عدد مرات الإضافة إلى قائمة الأمنيات (added_wishlist)**
-      if (!love) { // فقط عندما يتم إضافة المنتج وليس إزالته
+      // تحديث added_wishlist إذا تم الإضافة فقط
+      if (!love) {
         const { data: productData, error: fetchError } = await supabase
           .from("product")
           .select("added_wishlist")
@@ -101,21 +119,7 @@ export default function ProductCard({ product, slide }) {
       console.error("Error updating wishlist or added_wishlist count:", error.message);
     }
   }, [email, love, product.id]);
-
-  useEffect(() => {
-    checkWishlist();
-  }, [checkWishlist]);
-  const handleHeart = async (e) => {
-    e.stopPropagation(); // منع التنقل للصفحة عند الضغط على القلب
-
-    // تحديث الحالة المحلية على الفور
-    const newLove = !love;
-    setLove(newLove);
-
-    // تحديث الـ Supabase بعد التغيير
-    await updateWishlist();
-  };
-
+  
   return (
     <div className="product-card" onClick={() => navigate(`/product/${product.id}`)}>
       {loading ? (

@@ -213,7 +213,7 @@ export default function Product() {
 
   return (
     <>
-      <ProductHeader title={"Rouver"} />
+      <ProductHeader title={"Rouver"} product={product} />
       <ProductSlider images={product.images || []} />
       <div className="product-content">
         <div className="product-content-one">

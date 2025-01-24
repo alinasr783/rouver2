@@ -71,7 +71,7 @@ export default function Wishlist() {
 
   // إزالة المنتج من الـ wishlist فورًا في الواجهة
   const handleRemove = async (productId) => {
-    // تحديث الواجهة مباشرة (إخفاء المنتج)
+    // تحديث الواجهة مباشرة (إخفاء المنتج من الـ state)
     const updatedWishlist = wishlist.filter((product) => product.id !== productId);
     setWishlist(updatedWishlist);
 
@@ -116,21 +116,24 @@ export default function Wishlist() {
         ) : wishlist.length > 0 ? (
           <div className="wishlist-card">
             {wishlist.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                slide={true}
-                onRemove={handleRemove} // تمرير دالة الإزالة للمنتج
-              />
+              <div className="wishlist-item" key={product.id}>
+                <ProductCard
+                  product={product}
+                  slide={true}
+                  onRemove={handleRemove} // تمرير دالة الإزالة للمنتج
+                />
+              </div>
             ))}
           </div>
         ) : (
-          <div className="no-products">
+          <div className="empty-wishlist">
             <p>Your wishlist is empty!</p>
           </div>
         )}
       </div>
       <BottomHeader />
+      
     </>
   );
 }
+const a = 4;

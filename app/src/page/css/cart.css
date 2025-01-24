@@ -9,8 +9,6 @@
   max-width: 500px;
   padding-bottom: 280px;
   background-color: #f5f5f5; /* لون خلفية محايد */
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   font-family: "Quicksand", sans-serif;
 }
 
@@ -210,4 +208,11 @@
   100% {
     border-color: #162D3A;
   }
+}
+.empty-cart {
+  text-align: center;
+  margin: 50px 0;
+  font-size: 20px;
+  color: #999;
+  font-weight: bold;
 }
