@@ -73,7 +73,7 @@ export default function Address() {
       // تحديث العناوين بعد إزالة العنوان المحدد
       const updatedAddresses = addresses.filter((address) => address.id !== currentAddressId);
 
-      // إرسال العناوين المحدّثة إلى Supabase
+      // إرسال العناوين المعدلة إلى Supabase
       const { error } = await supabase
         .from("identity")
         .update({ address: updatedAddresses })
@@ -82,6 +82,7 @@ export default function Address() {
       if (!error) {
         // تحديث الحالة بعد الحذف
         setAddresses(updatedAddresses);
+        console.log("Address deleted successfully.");
       } else {
         console.error("Error updating addresses in Supabase:", error);
       }

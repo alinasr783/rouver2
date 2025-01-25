@@ -101,3 +101,29 @@
   left: 50%;
   transform: translateX(-50%);
 }
+
+
+.add-new-address button{
+  width: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: #fff;
+  border: 2px dashed var(--primary-color);
+  color: var(--primary-color);
+  box-shadow: 0px 4px 6px var(--shadow-color);
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.add-new-address:hover button{
+  background-color: var(--primary-color);
+  color: #fff;
+  box-shadow: 0px 6px 10px var(--shadow-color);
+}
+
+.add-new-address i {
+  margin-right: 10px;
+}

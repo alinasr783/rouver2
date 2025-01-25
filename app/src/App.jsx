@@ -16,6 +16,7 @@ import Address from './page/jsx/address.jsx';
 import Checkout from './page/jsx/checkout.jsx';
 import EditProfile from './page/jsx/editProfile.jsx';
 import NewAddress from './page/jsx/newAddress.jsx';
+import Order from './page/jsx/order.jsx';
 import Thanks from './page/jsx/thanks.jsx';
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
         <Route path="/profile/address" element={<Address />} />
         <Route path="/profile/edit" element={<EditProfile />} />
         <Route path="/new-address" element={<NewAddress />} />
+        <Route path="/order/:id" element={<Order />} />
         <Route path="/thanks" element={<Thanks />} />
       </Routes>
   );

@@ -212,6 +212,7 @@
   margin-right: 20px;
   background: #162D3A;
   border-radius: 100px;
+  border: none;
 }
 .product-bottom-header-content-icon{
   font-size:20px;
@@ -228,9 +229,10 @@
   display:flex;
   justify-content:center;
   align-items:center;
+  background: none;
+  border: none;
   font-family: "Quicksand", serif;
 }
-
 
 
 

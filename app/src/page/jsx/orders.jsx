@@ -49,9 +49,9 @@ export default function Orders() {
     }
   }, [email]);
 
-  const handleViewOrder = (orderId) => {
-    navigate(`/order/${orderId}`);
-  };
+  const handleViewOrder = (orderId, orderData) => {
+    navigate(`/order/${orderId}`, { state: { order: orderData } });
+  };  
 
   const handleCancelOrder = async (orderId) => {
     const { error } = await supabase
@@ -81,7 +81,7 @@ export default function Orders() {
       <div className="cart-content-items">
         <div className="cart-content-items-content">
           {orders.map((el, index) => (
-            <div className="cart-content-items-content-item" key={index}>
+            <div className="cart-content-items-content-item" key={index} onClick={()=>handleViewOrder(el.id,el)}>
               <img
                 alt="Product image"
                 height="80"

@@ -56,16 +56,25 @@ export default function Signup() {
   };
 
   const createUserColumn = async () => {
-    const { data, error } = await supabase
-      .from('user')
-      .insert([
-        { email: email, password: password } 
+    try {
+      // الوظيفة العامة لإضافة بيانات إلى الجداول المختلفة
+      const insertIntoTable = async (tableName) => {
+        const { data, error } = await supabase.from(tableName).insert([{ email }]);
+        if (error) throw new Error(`Error inserting into ${tableName} table: ${error.message}`);
+        return data;
+      };
+
+      // إدراج البيانات في الجداول المطلوبة
+      await Promise.all([
+        insertIntoTable("user"),
+        insertIntoTable("identity"),
+        insertIntoTable("cart"),
+        insertIntoTable("wishlist"),
       ]);
 
-    if (error) {
-      console.error('Error inserting data:', error);
-    } else {
-      console.log('Data inserted successfully:', data);
+      console.log("Email inserted successfully into user, identity, cart, and wishlist tables.");
+    } catch (error) {
+      console.error("Error inserting data:", error.message);
     }
   };
 

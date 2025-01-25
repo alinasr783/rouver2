@@ -300,9 +300,9 @@ export default function Product() {
                     className="product-bottom-header-content-icon"
                     dangerouslySetInnerHTML={{ __html: WhiteCart }}
                   />
-                  <div className="product-bottom-header-content-btn-add">
+                  <button className="product-bottom-header-content-btn-add">
                     Go to Cart
-                  </div>
+                  </button>
                 </div>
               </>
             ) : (
@@ -315,7 +315,7 @@ export default function Product() {
                     ${product.price || "0.00"}
                   </div>
                 </div>
-                <div
+                <button
                   className="product-bottom-header-content-btn"
                   onClick={()=>{handleAddToCart()}}
                 >
@@ -323,10 +323,10 @@ export default function Product() {
                     className="product-bottom-header-content-icon"
                     dangerouslySetInnerHTML={{ __html: WhiteCart }}
                   />
-                  <div className="product-bottom-header-content-btn-add">
+                  <button className="product-bottom-header-content-btn-add">
                     Add to Cart
-                  </div>
-                </div>
+                  </button>
+                </button>
               </>
             )}
           </div>

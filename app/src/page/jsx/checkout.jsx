@@ -119,7 +119,7 @@ export default function Checkout() {
         {
           products: products,
           state: "under read",
-          total_price: totalPrice,
+          total_price: totalPrice + 10,
           full_name: selectedAddress.full_name,
           phone: selectedAddress.phone,
           address: selectedAddress.address,
@@ -172,7 +172,7 @@ export default function Checkout() {
 
   return (
     <>
-      <Header title={"Checkout"} back={"cart"} />
+      <Header title={"Checkout"} back={"/cart"} />
       <div className="checkout-content">
         {loading ? (
           <Skeleton variant="rectangular" width="100%" height={200} />
@@ -219,6 +219,11 @@ export default function Checkout() {
                     />
                   ))}
                 </RadioGroup>
+                {/* زر "Add New Address" داخل الـ Dialog */}
+                <div className="add-address" onClick={() => navigate("/new-address", { state: { back } })}>
+                  <i className="fas fa-plus"></i>
+                  <span>Add New Address</span>
+                </div>
               </DialogContent>
               <DialogActions>
                 <Button onClick={handleCloseDialog} color="secondary">
@@ -257,7 +262,7 @@ export default function Checkout() {
         )}
       </div>
       <div className="checkout-content-button" onClick={handleMakeOrder}>
-          {btnLoading ? <CircularIndeterminate /> : "Make Order"}
+        {btnLoading ? <CircularIndeterminate /> : "Make Order"}
       </div>
     </>
   );
