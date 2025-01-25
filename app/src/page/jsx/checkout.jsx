@@ -124,6 +124,7 @@ export default function Checkout() {
           phone: selectedAddress.phone,
           address: selectedAddress.address,
           city: selectedAddress.city,
+          email: email,
         },
       ]);
 
