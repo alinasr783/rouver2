@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { supabase } from "../../lib/supabase.js"; // استيراد supabase
-import { getAuth, onAuthStateChanged } from "firebase/auth"; // استيراد Firebase
+import { supabase } from "../../lib/supabase.js";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import BottomHeader from "../../component/jsx/bottomHeader.jsx";
 import Header from "../../component/jsx/header.jsx";
 import AddressItem from "./AddressItem";
@@ -11,31 +11,26 @@ import "../css/address.css";
 
 export default function Address() {
   const [selectedAddress, setSelectedAddress] = useState("home");
-  const [addresses, setAddresses] = useState([]); // بيانات العناوين ستأتي من Supabase
-  const [email, setEmail] = useState(null); // لحفظ البريد الإلكتروني للمستخدم
+  const [addresses, setAddresses] = useState([]);
+  const [email, setEmail] = useState(null);
   const location = useLocation();
-  const back = "/profile/address"
-  const navigate = useNavigate(); // لاستخدام التنقل
+  const back = "/profile/address";
+  const navigate = useNavigate();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [currentAddressId, setCurrentAddressId] = useState(null);
 
-  // جلب العناوين من Supabase بعد التأكد من البريد الإلكتروني
   useEffect(() => {
     const fetchAddresses = async () => {
       if (email) {
         try {
-          // استرجاع البيانات من Supabase باستخدام البريد الإلكتروني للمستخدم
           const { data, error } = await supabase
-            .from("identity") // تحديد الجدول الذي يحتوي على العناوين
+            .from("identity")
             .select("address")
-            .eq("email", email); // استخدام البريد الإلكتروني الفعلي للمستخدم
+            .eq("email", email);
 
-          if (error) {
-            console.error("Error fetching addresses:", error);
-          } else {
-            // إذا تم جلب البيانات بنجاح، نقوم بتحديث الحالة
-            const fetchedAddresses = data?.[0]?.address || []; // استرجاع العناوين من الحقل
+          if (!error) {
+            const fetchedAddresses = data?.[0]?.address || [];
             setAddresses(fetchedAddresses);
           }
         } catch (err) {
@@ -45,42 +40,58 @@ export default function Address() {
     };
 
     fetchAddresses();
-  }, [email]); // إعادة التنفيذ عند تغيير البريد الإلكتروني
+  }, [email]);
 
-  // الحصول على البريد الإلكتروني من Firebase
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setEmail(user.email); // تعيين البريد الإلكتروني
+        setEmail(user.email);
       } else {
         setEmail(null);
-        navigate("/login"); // إذا لم يكن هناك مستخدم، التوجيه إلى صفحة تسجيل الدخول
+        navigate("/login");
       }
     });
 
-    return () => unsubscribe(); // إلغاء الاشتراك عند إزالة المكون
+    return () => unsubscribe();
   }, [navigate]);
 
-  // فتح القائمة
   const handleOpenMenu = (event, id) => {
     setAnchorEl(event.currentTarget);
     setCurrentAddressId(id);
   };
 
-  // إغلاق القائمة
   const handleCloseMenu = () => {
     setAnchorEl(null);
     setCurrentAddressId(null);
   };
 
-  // حذف العنوان
-  const handleDeleteAddress = () => {
-    setAddresses((prev) => prev.filter((address) => address.id !== currentAddressId));
-    handleCloseMenu();
+  const handleDeleteAddress = async () => {
+    if (!currentAddressId) return;
+
+    try {
+      // تحديث العناوين بعد إزالة العنوان المحدد
+      const updatedAddresses = addresses.filter((address) => address.id !== currentAddressId);
+
+      // إرسال العناوين المحدّثة إلى Supabase
+      const { error } = await supabase
+        .from("identity")
+        .update({ address: updatedAddresses })
+        .eq("email", email);
+
+      if (!error) {
+        // تحديث الحالة بعد الحذف
+        setAddresses(updatedAddresses);
+      } else {
+        console.error("Error updating addresses in Supabase:", error);
+      }
+    } catch (err) {
+      console.error("Error deleting address:", err);
+    } finally {
+      handleCloseMenu();
+    }
   };
 
-  // تغيير العنوان المحدد
   const handleAddressChange = (id) => {
     setSelectedAddress(id);
   };
@@ -91,7 +102,7 @@ export default function Address() {
       <div className="address-content">
         <div className="container">
           {addresses.length > 0 ? (
-            addresses.map(({ id, city, address, phone }) => (
+            addresses.map(({ id, city, address, phone, full_name }) => (
               <div
                 key={id}
                 onClick={(event) => handleOpenMenu(event, id)}
@@ -99,10 +110,11 @@ export default function Address() {
               >
                 <AddressItem
                   id={id}
-                  title={city}   // افتراض أن العنوان هو نفس "id"
+                  title={city}
                   city={city}
                   address={address}
                   phone={phone}
+                  full_name={full_name}
                   checked={selectedAddress === id}
                   onChange={() => handleAddressChange(id)}
                   selec={location.pathname}
@@ -110,7 +122,7 @@ export default function Address() {
               </div>
             ))
           ) : (
-            <p>No addresses available.</p> // إذا لم تكن هناك عناوين
+            <p>No addresses available.</p>
           )}
 
           <Menu
@@ -122,14 +134,14 @@ export default function Address() {
             <MenuItem onClick={handleCloseMenu}>Cancel</MenuItem>
           </Menu>
 
-          <div className="add-address"  onClick={()=>navigate("/new-address", { state: { back }})}>
+          <div className="add-address" onClick={() => navigate("/new-address", { state: { back } })}>
             <i className="fas fa-plus"></i>
             <span>Add New Shipping Address</span>
           </div>
         </div>
 
         {location.pathname !== "/profile/address" && (
-          <button className="apply-button" >Apply</button>
+          <button className="apply-button">Apply</button>
         )}
       </div>
       <BottomHeader />
