@@ -47,18 +47,51 @@ export default function NewAddress() {
     // تحقق من الحقول المطلوبة فقط بدون email
     if (fullName && phone && address && city) {
       try {
-        const savedAddresses = JSON.parse(localStorage.getItem("address")) || [];
-        savedAddresses.push(newAddress);  // Add the new address
-        localStorage.setItem("address", JSON.stringify(savedAddresses));  // Save to localStorage
+        const { data, error } = await supabase
+          .from("identity")
+          .select("address")
+          .eq("email", email)
+          .single();
 
-        navigate(state?.back ? state.back : "/profile/address", { state: { products } });
+        if (error) {
+          console.error("Error fetching address:", error);
+          return;
+        }
+
+        const newAddress = {
+          city: city,
+          address: address,
+          full_name: fullName,
+          phone: phone,
+        };
+
+        let updatedAddresses = data?.address || [];
+        updatedAddresses.push(newAddress);
+
+        const { error: updateError } = await supabase
+          .from("identity")
+          .update({ address: updatedAddresses })
+          .eq("email", email);
+
+        if (updateError) {
+          console.error("Error updating address:", updateError);
+        } else {
+          // حفظ العنوان في localStorage أيضًا
+          const savedAddresses =
+            JSON.parse(localStorage.getItem("address")) || [];
+          savedAddresses.push(newAddress);
+          localStorage.setItem("address", JSON.stringify(savedAddresses));
+          navigate(state?.back ? state.back : "/profile/address", {
+            state: { products },
+          });
+        }
       } catch (err) {
         console.error("Unexpected error:", err);
       }
     } else {
-      alert("Please fill in all the fields.");
     }
   };
+
   return (
     <>
       <Header title={"Add New Address"} back={"/profile/address"} />
