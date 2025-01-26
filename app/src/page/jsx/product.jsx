@@ -62,7 +62,6 @@ export default function Product() {
         setEmail(user.email);
       } else {
         setEmail(null);
-        navigate("/login");
       }
     });
 
@@ -71,24 +70,36 @@ export default function Product() {
 
   useEffect(() => {
     const checkProductInCart = async () => {
-      if (selectedSize && selectedColor && email) {
+      if (selectedSize && selectedColor) {
         try {
-          const { data: cartData, error: cartError } = await supabase
-            .from("cart")
-            .select("products")
-            .eq("email", email)
-            .single();
+          if (email) {
+            const { data: cartData, error: cartError } = await supabase
+              .from("cart")
+              .select("products")
+              .eq("email", email)
+              .single();
 
-          if (cartError) throw cartError;
+            if (cartError) throw cartError;
 
-          const isInCart = cartData?.products?.some(
-            (product) =>
-              product.size === selectedSize &&
-              product.color === selectedColor &&
-              product.id === id
-          );
+            const isInCart = cartData?.products?.some(
+              (product) =>
+                product.size === selectedSize &&
+                product.color === selectedColor &&
+                product.id === id
+            );
 
-          setIsProductInCart(isInCart);
+            setIsProductInCart(isInCart);
+          } else {
+            const cart = JSON.parse(localStorage.getItem("cart")) || [];
+            const isInCart = cart.some(
+              (product) =>
+                product.size === selectedSize &&
+                product.color === selectedColor &&
+                product.id === id
+            );
+
+            setIsProductInCart(isInCart);
+          }
         } catch (error) {
           console.error("Error checking cart:", error.message);
         }
@@ -99,8 +110,8 @@ export default function Product() {
   }, [selectedSize, selectedColor, email, id]);
 
 
-  const handleAddToCart = async () => {
-    if (selectedColor && selectedSize && email) {
+  const handleAddToCart = async() => {
+    if (selectedColor && selectedSize) {
       const productDetails = {
         id: product.id,
         img: product.images[0],
@@ -112,45 +123,66 @@ export default function Product() {
       };
 
       try {
-        // جلب السلة من Supabase
-        const { data: cartData, error: cartError } = await supabase
-          .from("cart")
-          .select("products")
-          .eq("email", email)
-          .single();
+        if (email) {
+          // For authenticated users
+          const { data: cartData, error: cartError } = await supabase
+            .from("cart")
+            .select("products")
+            .eq("email", email)
+            .single();
 
-        if (cartError) throw cartError;
+          if (cartError) throw cartError;
 
-        let currentProducts = cartData?.products || [];
+          let currentProducts = cartData?.products || [];
 
-        // التحقق إذا كان المنتج موجودًا بالفعل في السلة
-        const isInCart = currentProducts.some(
-          (item) =>
-            item.id === productDetails.id &&
-            item.size === productDetails.size &&
-            item.color === productDetails.color
-        );
+          const isInCart = currentProducts.some(
+            (item) =>
+              item.id === productDetails.id &&
+              item.size === productDetails.size &&
+              item.color === productDetails.color
+          );
 
-        if (isInCart) {
-          console.log("The product is already in the cart");
+          if (isInCart) {
+            console.log("The product is already in the cart");
+            setIsProductInCart(true);
+            return;
+          }
+
+          currentProducts.push(productDetails);
+
+          const { error: updateError } = await supabase
+            .from("cart")
+            .update({ products: currentProducts })
+            .eq("email", email);
+
+          if (updateError) throw updateError;
+
+          console.log("Product added to cart successfully");
           setIsProductInCart(true);
-          return;
+        } else {
+          // For guest users
+          let cart = JSON.parse(localStorage.getItem("cart")) || [];
+          const isInCart = cart.some(
+            (item) =>
+              item.id === productDetails.id &&
+              item.size === productDetails.size &&
+              item.color === productDetails.color
+          );
+
+          if (isInCart) {
+            console.log("The product is already in the cart");
+            setIsProductInCart(true);
+            return;
+          }
+
+          cart.push(productDetails);
+          localStorage.setItem("cart", JSON.stringify(cart));
+
+          console.log("Product added to cart successfully");
+          setIsProductInCart(true);
         }
 
-        // إضافة المنتج إلى السلة
-        currentProducts.push(productDetails);
-
-        const { error: updateError } = await supabase
-          .from("cart")
-          .update({ products: currentProducts })
-          .eq("email", email);
-
-        if (updateError) throw updateError;
-
-        console.log("Product added to cart successfully");
-        setIsProductInCart(true);
-
-        // زيادة عدد مرات الإضافة إلى السلة (added_cart)
+        // Update added_cart count in the product table
         const { data: productData, error: fetchError } = await supabase
           .from("product")
           .select("added_cart")
@@ -170,19 +202,27 @@ export default function Product() {
 
         console.log("Product added_cart count updated successfully");
       } catch (error) {
-        console.error("Error updating cart or added_cart count:", error.message);
+        console.error("Error adding product to cart:", error.message);
       }
     }
   };
 
   if (loading) {
     return (
-      <div>
+      <div className="loading-skeleton">
         <Skeleton variant="text" width="100%" height={40} />
         <Skeleton variant="rectangular" width="100%" height={300} />
         <Skeleton variant="text" width="80%" height={20} />
         <Skeleton variant="text" width="50%" height={20} />
         <Skeleton variant="rectangular" width="100%" height={60} />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="no-product-message">
+        <p>Product not found! Please try again later.</p>
       </div>
     );
   }

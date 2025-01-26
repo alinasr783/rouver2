@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase.js";
-import Badge from '@mui/material/Badge';
-import Skeleton from '@mui/material/Skeleton';
+import Badge from "@mui/material/Badge";
+import Skeleton from "@mui/material/Skeleton";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import "@fortawesome/fontawesome-free/css/all.css";
 import "../css/homeHeader.css";
@@ -12,7 +12,7 @@ export default function HomeHeader({ searchMode }) {
   const [name, setName] = useState("");
   const [greeting, setGreeting] = useState("");
   const [loading, setLoading] = useState(true);
-  const [unreadCount, setUnreadCount] = useState(0);  // عدد الإشعارات غير المقروءة
+  const [unreadCount, setUnreadCount] = useState(0); // عدد الإشعارات غير المقروءة
   const navigate = useNavigate();
 
   const getGreeting = () => {
@@ -44,6 +44,14 @@ export default function HomeHeader({ searchMode }) {
   };
 
   const getName = async (userEmail) => {
+    // التحقق من وجود الاسم في الـ localStorage
+    const localName = localStorage.getItem("first_name");
+    if (localName) {
+      setName(localName);
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from("identity")
@@ -51,26 +59,46 @@ export default function HomeHeader({ searchMode }) {
         .eq("email", userEmail)
         .single();
       if (error) throw error;
+
       setName(data.first_name);
+
+      // حفظ الاسم في الـ localStorage
+      localStorage.setItem("first_name", data.first_name);
     } catch (error) {
       console.error("Error fetching user name:", error.message);
-      setName("");
+      setName(""); // لا يوجد اسم، سيتم عرض التحية فقط
     } finally {
       setLoading(false);
     }
   };
 
   const getUnreadNotificationsCount = async (userEmail) => {
+    const localUnreadCount = localStorage.getItem("unread_notifications_count");
+
+    if (localUnreadCount) {
+      // إذا كان هناك بيانات في الـ localStorage، استخدمها وحدّث الحالة
+      setUnreadCount(parseInt(localUnreadCount, 10));
+      setLoading(false); // تحديث حالة التحميل
+      return;
+    }
+
     try {
       const { count, error } = await supabase
         .from("notification")
-        .select("id", { count: 'exact' })
+        .select("id", { count: "exact" })
         .eq("email", userEmail)
-        .eq("is_read", false);  // تصفية الإشعارات غير المقروءة فقط
+        .eq("is_read", false);
+
       if (error) throw error;
+
       setUnreadCount(count);
+
+      // حفظ عدد الإشعارات غير المقروءة في الـ localStorage
+      localStorage.setItem("unread_notifications_count", count);
     } catch (error) {
       console.error("Error fetching unread notifications count:", error.message);
+    } finally {
+      setLoading(false); // تأكد من تحديث حالة التحميل حتى إذا حدث خطأ
     }
   };
 
@@ -80,11 +108,11 @@ export default function HomeHeader({ searchMode }) {
       if (user) {
         setEmail(user.email);
         getName(user.email);
-        getUnreadNotificationsCount(user.email);  // جلب عدد الإشعارات غير المقروءة
+        getUnreadNotificationsCount(user.email); // جلب عدد الإشعارات غير المقروءة
       } else {
         setEmail(null);
-        setName("");
-        navigate("/login");
+        setName(""); // لا يوجد مستخدم، عرض التحية فقط
+        setLoading(false)
       }
     });
 
@@ -111,11 +139,17 @@ export default function HomeHeader({ searchMode }) {
           {loading ? (
             <Skeleton variant="circular" width={45} height={45} />
           ) : (
-            <div className="home-header-content-notification-bg" onClick={() => navigate('/notification')}>
+            <div
+              className="home-header-content-notification-bg"
+              onClick={() => navigate("/notification")}
+            >
               <Badge
                 badgeContent={unreadCount}
                 sx={{
-                  "& .MuiBadge-badge": { color: "#f4f4f4", backgroundColor: "#37474f" },
+                  "& .MuiBadge-badge": {
+                    color: "#f4f4f4",
+                    backgroundColor: "#37474f",
+                  },
                 }}
               >
                 <i className="fas fa-bell"></i>

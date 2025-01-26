@@ -22,7 +22,6 @@ export default function Cart() {
         setEmail(user.email);
       } else {
         setEmail(null);
-        navigate("/login");
       }
     });
     return () => unsubscribe();
@@ -49,6 +48,10 @@ export default function Cart() {
           setLoading(false);
         }
       })();
+    } else {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      setProducts(cart);
+      setLoading(false);
     }
   }, [email]);
 
@@ -65,10 +68,15 @@ export default function Cart() {
       item.id === id ? { ...item, count: item.count + 1 } : item,
     );
     setProducts(updatedProducts);
-    await supabase
-      .from("cart")
-      .update({ products: updatedProducts })
-      .eq("email", email);
+
+    if (email) {
+      await supabase
+        .from("cart")
+        .update({ products: updatedProducts })
+        .eq("email", email);
+    } else {
+      localStorage.setItem("cart", JSON.stringify(updatedProducts));
+    }
   };
 
   const remove = async (id) => {
@@ -78,23 +86,33 @@ export default function Cart() {
         : item,
     );
     setProducts(updatedProducts);
-    await supabase
-      .from("cart")
-      .update({ products: updatedProducts })
-      .eq("email", email);
+
+    if (email) {
+      await supabase
+        .from("cart")
+        .update({ products: updatedProducts })
+        .eq("email", email);
+    } else {
+      localStorage.setItem("cart", JSON.stringify(updatedProducts));
+    }
   };
 
   const deleteItem = async (id) => {
     const updatedProducts = products.filter((item) => item.id !== id);
     setProducts(updatedProducts);
-    await supabase
-      .from("cart")
-      .update({ products: updatedProducts })
-      .eq("email", email);
+
+    if (email) {
+      await supabase
+        .from("cart")
+        .update({ products: updatedProducts })
+        .eq("email", email);
+    } else {
+      localStorage.setItem("cart", JSON.stringify(updatedProducts));
+    }
   };
 
   const handleProceedToCheckout = () => {
-    navigate("/checkout", { state: { products } }); // تمرير المنتجات إلى صفحة Checkout عبر state
+    navigate("/checkout", { state: { products } });
   };
 
   return (

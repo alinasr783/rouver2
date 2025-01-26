@@ -18,7 +18,6 @@ export default function ProductHeader({ title, product }) {
         setEmail(user.email);
       } else {
         setEmail(null);
-        navigate("/login");
       }
     });
 
@@ -26,72 +25,82 @@ export default function ProductHeader({ title, product }) {
   }, [navigate]);
 
   const checkWishlist = useCallback(async () => {
-    if (!email) return;
+    if (email) {
+      try {
+        const { data, error } = await supabase
+          .from("wishlist")
+          .select("products")
+          .eq("email", email)
+          .single();
 
-    try {
-      const { data, error } = await supabase
-        .from("wishlist")
-        .select("products")
-        .eq("email", email)
-        .single();
+        if (error) throw error;
 
-      if (error) throw error;
-
-      setLove(data.products.includes(product.id));
-    } catch (error) {
-      console.error("Error checking wishlist:", error.message);
-    } finally {
-      setLoading(false);
+        setLove(data.products.includes(product.id));
+      } catch (error) {
+        console.error("Error checking wishlist:", error.message);
+      }
+    } else {
+      const localWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+      setLove(localWishlist.includes(product.id));
     }
+    setLoading(false);
   }, [email, product.id]);
 
   const updateWishlist = useCallback(async () => {
-    if (!email) return;
-
-    try {
-      const { data, error } = await supabase
-        .from("wishlist")
-        .select("products")
-        .eq("email", email)
-        .single();
-
-      if (error) throw error;
-
-      const updatedProducts = love
-        ? data.products.filter((id) => id !== product.id) // إزالة المنتج
-        : [...data.products, product.id]; // إضافة المنتج
-
-      const { error: updateError } = await supabase
-        .from("wishlist")
-        .update({ products: updatedProducts })
-        .eq("email", email);
-
-      if (updateError) throw updateError;
-
-      console.log("Wishlist updated successfully");
-
-      if (!love) { // تحديث عدد الإضافات فقط عند الإضافة
-        const { data: productData, error: fetchError } = await supabase
-          .from("product")
-          .select("added_wishlist")
-          .eq("id", product.id)
+    if (email) {
+      try {
+        const { data, error } = await supabase
+          .from("wishlist")
+          .select("products")
+          .eq("email", email)
           .single();
 
-        if (fetchError) throw fetchError;
+        if (error) throw error;
 
-        const updatedWishlistCount = (productData.added_wishlist || 0) + 1;
+        const updatedProducts = love
+          ? data.products.filter((id) => id !== product.id) // إزالة المنتج
+          : [...data.products, product.id]; // إضافة المنتج
 
-        const { error: updateWishlistCountError } = await supabase
-          .from("product")
-          .update({ added_wishlist: updatedWishlistCount })
-          .eq("id", product.id);
+        const { error: updateError } = await supabase
+          .from("wishlist")
+          .update({ products: updatedProducts })
+          .eq("email", email);
 
-        if (updateWishlistCountError) throw updateWishlistCountError;
+        if (updateError) throw updateError;
 
-        console.log("Product added_wishlist count updated successfully");
+        console.log("Wishlist updated successfully");
+
+        if (!love) {
+          const { data: productData, error: fetchError } = await supabase
+            .from("product")
+            .select("added_wishlist")
+            .eq("id", product.id)
+            .single();
+
+          if (fetchError) throw fetchError;
+
+          const updatedWishlistCount = (productData.added_wishlist || 0) + 1;
+
+          const { error: updateWishlistCountError } = await supabase
+            .from("product")
+            .update({ added_wishlist: updatedWishlistCount })
+            .eq("id", product.id);
+
+          if (updateWishlistCountError) throw updateWishlistCountError;
+
+          console.log("Product added_wishlist count updated successfully");
+        }
+      } catch (error) {
+        console.error("Error updating wishlist or added_wishlist count:", error.message);
       }
-    } catch (error) {
-      console.error("Error updating wishlist or added_wishlist count:", error.message);
+    } else {
+      // تحديث الـ wishlist في localStorage
+      const localWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+      const updatedWishlist = love
+        ? localWishlist.filter((id) => id !== product.id) // إزالة المنتج
+        : [...localWishlist, product.id]; // إضافة المنتج
+
+      localStorage.setItem("wishlist", JSON.stringify(updatedWishlist));
     }
   }, [email, love, product.id]);
 

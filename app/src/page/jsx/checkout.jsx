@@ -37,29 +37,41 @@ export default function Checkout() {
   const [btnLoading, setBtnLoading] = useState(false);
   const back = "/checkout";
 
-  // جلب العناوين من Supabase
+  // جلب العناوين من Supabase أو LocalStorage إذا لم يوجد بريد
   const getAddress = async () => {
     try {
-      const { data, error } = await supabase
-        .from("identity")
-        .select("address")
-        .eq("email", email)
-        .single();
+      if (email) {
+        const { data, error } = await supabase
+          .from("identity")
+          .select("address")
+          .eq("email", email)
+          .single();
 
-      if (error) {
-        console.error("Error fetching addresses:", error);
-        return;
-      }
+        if (error) {
+          console.error("Error fetching addresses:", error);
+          return;
+        }
 
-      if (data?.address?.length > 0) {
-        setAddresses(data.address);
-        setSelectedAddress(data.address[0]);
-        setLoading(false);
+        if (data?.address?.length > 0) {
+          setAddresses(data.address);
+          setSelectedAddress(data.address[0]);
+          setLoading(false);
+        } else {
+          navigate("/new-address", { state: { back, products } });
+        }
       } else {
-        navigate("/new-address", { state: { back, products } });
+        const storedAddresses = JSON.parse(localStorage.getItem("address")) || [];
+        if (storedAddresses.length > 0) {
+          setAddresses(storedAddresses);
+          setSelectedAddress(storedAddresses[0]);
+        } else {
+          navigate("/new-address", { state: { back, products } });
+        }
+        setLoading(false);
       }
     } catch (err) {
       console.error("Unexpected error:", err);
+      setLoading(false);
     }
   };
 
@@ -71,18 +83,16 @@ export default function Checkout() {
         setEmail(user.email);
       } else {
         setEmail(null);
-        navigate("/login");
+        setLoading(false);
       }
     });
 
     return () => unsubscribe();
   }, [navigate]);
 
-  // جلب العناوين بمجرد توفر البريد الإلكتروني
+  // جلب العناوين بمجرد توفر البريد الإلكتروني أو عندما لا يكون موجود
   useEffect(() => {
-    if (email) {
-      getAddress();
-    }
+    getAddress();
   }, [email]);
 
   // فتح الحوار

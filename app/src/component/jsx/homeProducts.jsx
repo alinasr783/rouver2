@@ -129,21 +129,6 @@ export default function HomeProducts() {
                 ))}
               </Swiper>
             </div>
-            {/*<div className="home-products-content cards">
-    <Swiper
-      effect={'cards'}
-      grabCursor={true}
-      modules={[EffectCards]}
-      className="home-products-cards"
-    >
-      <SwiperSlide className="home-products-card">
-        <ProductCard product={product[0]} slide={false}/>
-      </SwiperSlide>
-      <SwiperSlide>
-        <ProductCard product={product[0]} slide={false}/>
-      </SwiperSlide>
-    </Swiper>
-  </div>*/}
           </>
         )}
       </div>

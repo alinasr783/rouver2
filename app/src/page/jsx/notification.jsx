@@ -3,10 +3,9 @@ import { supabase } from "../../lib/supabase.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import BottomHeader from "../../component/jsx/bottomHeader.jsx";
 import Header from "../../component/jsx/header.jsx";
-import Skeleton from '@mui/material/Skeleton'; // إضافة Skeleton
+import Skeleton from '@mui/material/Skeleton';
 import "../css/notification.css";
 
-// تنسيق التاريخ لعرضه في الإشعارات
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   const today = new Date();
@@ -27,8 +26,8 @@ export default function Notification() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("All");
   const [email, setEmail] = useState(null);
+  const [showPopup, setShowPopup] = useState(false); // حالة عرض النافذة المنبثقة
 
-  // التحقق من حالة المستخدم في Firebase
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -36,13 +35,13 @@ export default function Notification() {
         setEmail(user.email);
       } else {
         setEmail(null);
+        setShowPopup(true); // عرض النافذة إذا لم يكن هناك تسجيل دخول
       }
     });
 
     return () => unsubscribe();
   }, []);
 
-  // جلب الإشعارات الخاصة بالمستخدم من Supabase
   useEffect(() => {
     const fetchNotifications = async () => {
       if (!email) return;
@@ -52,7 +51,7 @@ export default function Notification() {
       const { data, error } = await supabase
         .from("notification")
         .select("*")
-        .eq("email", email) // جلب الإشعارات الخاصة بالمستخدم فقط
+        .eq("email", email)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -67,7 +66,6 @@ export default function Notification() {
     fetchNotifications();
   }, [email]);
 
-  // تصفية الإشعارات حسب الفئة المحددة
   const filteredNotifications =
     filter === "All"
       ? notifications
@@ -76,7 +74,6 @@ export default function Notification() {
             notification.tag?.toLowerCase() === filter.toLowerCase()
         );
 
-  // تجميع الإشعارات حسب التاريخ
   const groupedNotifications = filteredNotifications.reduce((acc, notification) => {
     const dateKey = formatDate(notification.created_at);
     if (!acc[dateKey]) acc[dateKey] = [];
@@ -84,7 +81,6 @@ export default function Notification() {
     return acc;
   }, {});
 
-  // تعيين كل الإشعارات كـ "مقروءة" حسب التاريخ
   const markAllAsRead = (dateKey) => {
     setNotifications((prev) =>
       prev.map((notification) =>
@@ -96,7 +92,6 @@ export default function Notification() {
   };
 
   const handleNotificationClick = async (id) => {
-    // تحديث حالة الإشعار في Supabase إلى "مقروء"
     const { error } = await supabase
       .from("notification")
       .update({ is_read: true })
@@ -105,7 +100,6 @@ export default function Notification() {
     if (error) {
       console.error("Error updating notification:", error);
     } else {
-      // تحديث الحالة في الواجهة
       setNotifications((prev) =>
         prev.map((notification) =>
           notification.id === id ? { ...notification, is_read: true } : notification
@@ -114,12 +108,16 @@ export default function Notification() {
     }
   };
 
-  // التعامل مع حذف إشعار معين عند الضغط مرتين
   const handleDoubleClick = (id) => {
     setNotifications((prev) => prev.filter((notification) => notification.id !== id));
   };
 
-  // عرض Skeleton أثناء التحميل
+  const handleSignUp = () => {
+    setShowPopup(false); // إخفاء النافذة
+    // إعادة توجيه المستخدم لصفحة التسجيل
+    navigate("/signup");
+  };
+
   if (loading) {
     return (
       <>
@@ -194,6 +192,18 @@ export default function Notification() {
         )}
       </div>
       <BottomHeader />
+
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <h3>Sign Up Now!</h3>
+            <p>You need to create an account to view notifications.</p>
+            <button onClick={handleSignUp} className="signup-btn">
+              Sign Up Now
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

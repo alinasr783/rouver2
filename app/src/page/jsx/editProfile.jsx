@@ -20,7 +20,6 @@ export default function EditProfile() {
         setEmail(user.email);
       } else {
         setEmail(null);
-        navigate("/login");
       }
     });
 

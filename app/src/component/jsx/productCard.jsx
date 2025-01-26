@@ -10,11 +10,11 @@ import "swiper/css";
 
 export default function ProductCard({ product, slide }) {
   const [love, setLove] = useState(false);
-  const [email, setEmail] = useState(null); 
-  const [loading, setLoading] = useState(true); 
+  const [email, setEmail] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // get user email
+  // جلب إيميل المستخدم من Firebase
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -22,29 +22,37 @@ export default function ProductCard({ product, slide }) {
         setEmail(user.email);
       } else {
         setEmail(null);
-        navigate("/login");
       }
     });
 
     return () => unsubscribe();
   }, [navigate]);
-  // check if user loved the product
-  const checkWishlist = useCallback(async () => {
-    if (!email) return;
 
-    try {
-      const { data, error } = await supabase
-        .from("wishlist")
-        .select("products")
-        .eq("email", email)
-        .single();
+  // التحقق من حالة المنتج في الـ wishlist
+  const checkWishlist = useCallback(() => {
+    if (email) {
+      // التحقق من Supabase إذا كان المستخدم مسجلًا
+      (async () => {
+        try {
+          const { data, error } = await supabase
+            .from("wishlist")
+            .select("products")
+            .eq("email", email)
+            .single();
 
-      if (error) throw error;
+          if (error) throw error;
 
-      setLove(data.products.includes(product.id));
-    } catch (error) {
-      console.error("Error checking wishlist:", error.message);
-    } finally {
+          setLove(data.products.includes(product.id));
+        } catch (error) {
+          console.error("Error checking wishlist:", error.message);
+        } finally {
+          setLoading(false);
+        }
+      })();
+    } else {
+      // التحقق من localStorage إذا لم يكن هناك مستخدم
+      const localWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+      setLove(localWishlist.includes(product.id));
       setLoading(false);
     }
   }, [email, product.id]);
@@ -52,26 +60,24 @@ export default function ProductCard({ product, slide }) {
   useEffect(() => {
     checkWishlist();
   }, [checkWishlist]);
-  
-  const handleHeart = async (e) => {
-    e.stopPropagation(); // منع التنقل للصفحة عند الضغط على القلب
+
+  // تحديث الـ wishlist
+  const handleHeart = (e) => {
+    e.stopPropagation(); // منع التنقل عند الضغط على القلب
 
     // تغيير الحالة مباشرة
     setLove((prevLove) => !prevLove);
 
-    try {
-      // تحديث الـ wishlist
-      await updateWishlist();
-    } catch (error) {
-      console.error("Error updating wishlist:", error.message);
-      // لو في خطأ، رجع الحالة الأصلية
-      setLove((prevLove) => !prevLove);
+    if (email) {
+      // تحديث في Supabase
+      updateWishlistInDatabase();
+    } else {
+      // تحديث في localStorage
+      updateWishlistInLocalStorage();
     }
   };
 
-  const updateWishlist = useCallback(async () => {
-    if (!email) return;
-
+  const updateWishlistInDatabase = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("wishlist")
@@ -82,7 +88,7 @@ export default function ProductCard({ product, slide }) {
       if (error) throw error;
 
       const updatedProducts = love
-        ? data.products.filter((id) => id !== product.id) // إزالة المنتج من الـ wishlist
+        ? data.products.filter((id) => id !== product.id) // إزالة المنتج
         : [...data.products, product.id]; // إضافة المنتج
 
       const { error: updateError } = await supabase
@@ -93,33 +99,26 @@ export default function ProductCard({ product, slide }) {
       if (updateError) throw updateError;
 
       console.log("Wishlist updated successfully");
-
-      // تحديث added_wishlist إذا تم الإضافة فقط
-      if (!love) {
-        const { data: productData, error: fetchError } = await supabase
-          .from("product")
-          .select("added_wishlist")
-          .eq("id", product.id)
-          .single();
-
-        if (fetchError) throw fetchError;
-
-        const updatedWishlistCount = (productData.added_wishlist || 0) + 1;
-
-        const { error: updateWishlistCountError } = await supabase
-          .from("product")
-          .update({ added_wishlist: updatedWishlistCount })
-          .eq("id", product.id);
-
-        if (updateWishlistCountError) throw updateWishlistCountError;
-
-        console.log("Product added_wishlist count updated successfully");
-      }
     } catch (error) {
-      console.error("Error updating wishlist or added_wishlist count:", error.message);
+      console.error("Error updating wishlist:", error.message);
     }
   }, [email, love, product.id]);
-  
+
+  const updateWishlistInLocalStorage = () => {
+    let localWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+    if (love) {
+      // إزالة المنتج
+      localWishlist = localWishlist.filter((id) => id !== product.id);
+    } else {
+      // إضافة المنتج
+      localWishlist.push(product.id);
+    }
+
+    localStorage.setItem("wishlist", JSON.stringify(localWishlist));
+    console.log("Wishlist updated in localStorage:", localWishlist);
+  };
+
   return (
     <div className="product-card" onClick={() => navigate(`/product/${product.id}`)}>
       {loading ? (
@@ -151,10 +150,7 @@ export default function ProductCard({ product, slide }) {
           <div className="product-card-content-bottom">
             <div className="product-card-content-price">${product.price}</div>
           </div>
-          <div
-            className="product-card-content-heart"
-            onClick={handleHeart}
-          >
+          <div className="product-card-content-heart" onClick={handleHeart}>
             <div
               className="product-card-content-heart-icon"
               dangerouslySetInnerHTML={{

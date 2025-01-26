@@ -22,7 +22,6 @@ export default function Wishlist() {
         setEmail(user.email);
       } else {
         setEmail(null);
-        navigate("/login");
       }
     });
 
@@ -31,10 +30,31 @@ export default function Wishlist() {
 
   // جلب بيانات المنتجات في الـ wishlist
   useEffect(() => {
+    const fetchWishlistData = async (productIds) => {
+      try {
+        const { data: productsData, error: productsError } = await supabase
+          .from("product")
+          .select("*")
+          .in("id", productIds);
+
+        if (productsError) {
+          console.error("Error fetching products:", productsError);
+          setWishlist([]);
+        } else {
+          setWishlist(productsData);
+        }
+      } catch (err) {
+        console.error("Unexpected error:", err);
+        setWishlist([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (email) {
+      // جلب المنتجات من Supabase إذا كان هناك بريد إلكتروني
       (async () => {
         try {
-          // جلب المنتجات من Supabase
           const { data, error } = await supabase
             .from("wishlist")
             .select("products")
@@ -45,27 +65,24 @@ export default function Wishlist() {
             console.error("Error fetching wishlist:", error);
             setWishlist([]);
           } else if (data?.products?.length > 0) {
-            const { data: productsData, error: productsError } = await supabase
-              .from("product")
-              .select("*")
-              .in("id", data.products);
-
-            if (productsError) {
-              console.error("Error fetching products:", productsError);
-              setWishlist([]);
-            } else {
-              setWishlist(productsData);
-            }
+            fetchWishlistData(data.products);
           } else {
             setWishlist([]);
           }
         } catch (err) {
           console.error("Unexpected error:", err);
           setWishlist([]);
-        } finally {
-          setLoading(false);
         }
       })();
+    } else {
+      // جلب المنتجات من localStorage إذا لم يكن هناك بريد إلكتروني
+      const storedWishlist = JSON.parse(localStorage.getItem("wishlist"));
+      if (storedWishlist && storedWishlist.length > 0) {
+        fetchWishlistData(storedWishlist);
+      } else {
+        setWishlist([]);
+        setLoading(false);
+      }
     }
   }, [email]);
 
@@ -75,31 +92,38 @@ export default function Wishlist() {
     const updatedWishlist = wishlist.filter((product) => product.id !== productId);
     setWishlist(updatedWishlist);
 
-    // التحديث في Supabase بعد التحديث في الواجهة
-    try {
-      const { data, error } = await supabase
-        .from("wishlist")
-        .select("products")
-        .eq("email", email)
-        .single();
+    if (email) {
+      // التحديث في Supabase إذا كان هناك بريد إلكتروني
+      try {
+        const { data, error } = await supabase
+          .from("wishlist")
+          .select("products")
+          .eq("email", email)
+          .single();
 
-      if (error) {
-        console.error("Error fetching wishlist for update:", error);
-        return;
+        if (error) {
+          console.error("Error fetching wishlist for update:", error);
+          return;
+        }
+
+        const updatedProducts = data.products.filter((id) => id !== productId);
+
+        const { error: updateError } = await supabase
+          .from("wishlist")
+          .update({ products: updatedProducts })
+          .eq("email", email);
+
+        if (updateError) {
+          console.error("Error updating wishlist:", updateError);
+        }
+      } catch (err) {
+        console.error("Unexpected error while updating wishlist:", err);
       }
-
-      const updatedProducts = data.products.filter((id) => id !== productId);
-
-      const { error: updateError } = await supabase
-        .from("wishlist")
-        .update({ products: updatedProducts })
-        .eq("email", email);
-
-      if (updateError) {
-        console.error("Error updating wishlist:", updateError);
-      }
-    } catch (err) {
-      console.error("Unexpected error while updating wishlist:", err);
+    } else {
+      // التحديث في localStorage إذا لم يكن هناك بريد إلكتروني
+      const storedWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+      const updatedStoredWishlist = storedWishlist.filter((id) => id !== productId);
+      localStorage.setItem("wishlist", JSON.stringify(updatedStoredWishlist));
     }
   };
 
@@ -132,8 +156,6 @@ export default function Wishlist() {
         )}
       </div>
       <BottomHeader />
-      
     </>
   );
 }
-const a = 4;

@@ -108,3 +108,80 @@
   font-size: 14px;
   margin-top: 20px;
 }
+
+@keyframes scaleUp {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.2);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+/* خلفية الـ Popup */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4); /* خلفية شفافة */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* محتوى الـ Popup */
+.popup-content {
+  background: #fff; /* خلفية بيضاء */
+  width: 80%; /* ملاءمة العرض */
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  animation: scaleUp 0.3s ease-out;
+  font-family: "Quicksand", serif; /* نفس الخط */
+}
+
+/* العنوان */
+.popup-content h3 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #8b4513; /* لون مشابه للعنوان */
+  margin-bottom: 15px;
+}
+
+/* النص */
+.popup-content p {
+  font-size: 16px;
+  color: #704f38; /* لون مشابه للأيقونة */
+  margin-bottom: 20px;
+}
+
+/* زر التسجيل */
+.signup-btn {
+  background-color: #704f38; /* نفس لون زر الطلب */
+  color: white;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  width: 100%; /* ليملأ العرض */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.signup-btn:hover {
+  transform: scale(1.05); /* تأثير عند التمرير */
+}
+

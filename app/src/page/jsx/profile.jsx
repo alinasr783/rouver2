@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase.js";
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth"; // إضافة onAuthStateChanged
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import BottomHeader from "../../component/jsx/bottomHeader.jsx";
 import Header from "../../component/jsx/header.jsx";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -18,11 +18,12 @@ function CircularIndeterminate() {
 
 export default function Profile() {
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState(null); // البريد الإلكتروني للمستخدم
-  const [fullName, setFullName] = useState(""); // تخزين الاسم الكامل
+  const [email, setEmail] = useState(null);
+  const [fullName, setFullName] = useState("");
+  const [showPopup, setShowPopup] = useState(false); // للتحكم في ظهور الـ popup
   const navigate = useNavigate();
 
-  // جلب البريد الإلكتروني للمستخدم عند تسجيل الدخول
+  // التحقق مما إذا كان المستخدم مسجل دخول
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -30,7 +31,7 @@ export default function Profile() {
         setEmail(user.email);
       } else {
         setEmail(null);
-        navigate("/login");
+        setShowPopup(true); // عرض الـ popup إذا لم يكن هناك مستخدم
       }
     });
 
@@ -43,14 +44,14 @@ export default function Profile() {
       if (email) {
         try {
           const { data, error } = await supabase
-            .from("identity") // اسم الجدول
-            .select("fullName") // تحديد الحقل المطلوب
+            .from("identity")
+            .select("fullName")
             .eq("email", email)
             .single();
 
           if (error) throw error;
 
-          setFullName(data.fullName); // تحديث الاسم
+          setFullName(data.fullName);
         } catch (error) {
           console.error("Error fetching user data:", error.message);
         }
@@ -63,7 +64,7 @@ export default function Profile() {
   // دالة تسجيل الخروج
   const handleLogout = () => {
     setLoading(true);
-    const auth = getAuth(); // جلب كائن المصادقة من Firebase
+    const auth = getAuth();
     signOut(auth)
       .then(() => {
         setLoading(false);
@@ -77,8 +78,14 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    window.scrollTo(0, 0); // التمرير إلى أعلى نقطة في الصفحة
+    window.scrollTo(0, 0);
   }, []);
+
+  // التوجيه إلى صفحة التسجيل
+  const handleSignUp = () => {
+    setShowPopup(false); // إغلاق النافذة
+    navigate("/signup");
+  };
 
   return (
     <>
@@ -156,6 +163,19 @@ export default function Profile() {
         </ul>
       </div>
       <BottomHeader />
+
+      {/* نافذة منبثقة إذا لم يكن المستخدم مسجل حسابًا */}
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <h3>Sign Up Now!</h3>
+            <p>Create an account to access your profile and get exclusive offers.</p>
+            <button onClick={handleSignUp} className="signup-btn">
+              Sign Up Now
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

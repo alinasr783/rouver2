@@ -6,7 +6,7 @@ export default function SearchInput({ setSearchMode }) {
   const [search, setSearch] = useState("");
 
   const handleSearchMode = () => {
-    setSearchMode(true);
+    setSearchMode(false);
   };
 
   return (

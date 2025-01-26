@@ -49,7 +49,6 @@ export default function Address() {
         setEmail(user.email);
       } else {
         setEmail(null);
-        navigate("/login");
       }
     });
 
