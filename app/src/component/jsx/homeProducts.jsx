@@ -13,7 +13,7 @@ import ProductCard from "./productCard.jsx";
 import "../css/homeProducts.css";
 
 export default function HomeProducts() {
-  const [product, setProduct] = useState({});
+  const [product, setProduct] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newProduct, setNewProduct] = useState([]);
   const [top_rating, setTop_rating] = useState([]);
@@ -30,12 +30,11 @@ export default function HomeProducts() {
       console.log(data);
     }
   };
-  
 
-  
   useEffect(() => {
     getProduct();
   }, []);
+
   useEffect(() => {
     if (product.length > 0) {
       const newProducts = [];
@@ -43,11 +42,13 @@ export default function HomeProducts() {
       const bestPriceProducts = [];
 
       product.forEach((item) => {
-        item.tags.forEach((el) => {
-          if (el === "new") newProducts.push(item);
-          if (el === "top_rating") topRatedProducts.push(item);
-          if (el === "best_price") bestPriceProducts.push(item);
-        });
+        if (item.tags && Array.isArray(item.tags)) {
+          item.tags.forEach((el) => {
+            if (el === "new") newProducts.push(item);
+            if (el === "top_rating") topRatedProducts.push(item);
+            if (el === "best_price") bestPriceProducts.push(item);
+          });
+        }
       });
 
       setNewProduct(newProducts);
@@ -55,83 +56,83 @@ export default function HomeProducts() {
       setBest_price(bestPriceProducts);
     }
   }, [product]);
+
   return (
-    <>
-      <div className="home-products">
-        {loading ? (
-          <Skeleton variant="rounded" width="98%" height={230} />
-        ) : (
-          <>
-            <div className="home-products-title">Products</div>
-            <div className="home-products-content">
-              <ProductCard product={product[0]} slide={true} /> 
-              <ProductCard product={product[1]} slide={true} />
-              <ProductCard product={product[2]} slide={true} />
-              <ProductCard product={product[3]} slide={true} />
-            </div>
-            {best_price.length > 0 && (
-              <>
-                <div className="home-products-title">Best Price</div>
-                <div className="home-products-content">
-                  <Swiper
-                    effect="cube"
-                    grabCursor
-                    cubeEffect={{
-                      shadow: false,
-                      slideShadows: false,
-                      shadowOffset: 20,
-                      shadowScale: 0.94,
-                    }}
-                    modules={[EffectCube]}
-                    className="home-products-cube"
-                  >
-                    {chunk(best_price, 4).map((group, index) => (
-                      <SwiperSlide key={index}>
-                        <div className="flex">
-                          {group[0] && <ProductCard product={group[0]} />}
-                          {group[1] && <ProductCard product={group[1]} />}
-                        </div>
-                        <div className="flex">
-                          {group[2] && <ProductCard product={group[2]} />}
-                          {group[3] && <ProductCard product={group[3]} />}
-                        </div>
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
-                </div>
-              </>
-            )}
-            {top_rating.length > 0 && (
+    <div className="home-products">
+      {loading ? (
+        <Skeleton variant="rounded" width="98%" height={230} />
+      ) : (
+        <>
+          <div className="home-products-title">Products</div>
+          <div className="home-products-content">
+            {product.slice(0, 4).map((prod, index) => (
+              <ProductCard key={prod.id} product={prod} slide={true} />
+            ))}
+          </div>
+
+          {best_price.length > 0 && (
+            <>
+              <div className="home-products-title">Best Price</div>
+              <div className="home-products-content">
+                <Swiper
+                  effect="cube"
+                  grabCursor
+                  cubeEffect={{
+                    shadow: false,
+                    slideShadows: false,
+                    shadowOffset: 20,
+                    shadowScale: 0.94,
+                  }}
+                  modules={[EffectCube]}
+                  className="home-products-cube"
+                >
+                  {chunk(best_price, 4).map((group, index) => (
+                    <SwiperSlide key={index}>
+                      <div className="flex">
+                        {group[0] && <ProductCard key={group[0].id} product={group[0]} />}
+                        {group[1] && <ProductCard key={group[1].id} product={group[1]} />}
+                      </div>
+                      <div className="flex">
+                        {group[2] && <ProductCard key={group[2].id} product={group[2]} />}
+                        {group[3] && <ProductCard key={group[3].id} product={group[3]} />}
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
+            </>
+          )}
+
+          {top_rating.length > 0 && (
             <>
               <div className="home-products-title">Top Rating</div>
-
               <div className="home-products-content">
-                {top_rating.map((el)=>(
-                  <ProductCard product={el} slide={true} />
+                {top_rating.map((el) => (
+                  <ProductCard key={el.id} product={el} slide={true} />
                 ))}
               </div>
             </>
-            )}
-            {newProduct.length > 0 && (
+          )}
+
+          {newProduct.length > 0 && (
             <div className="home-products-title">Look at here</div>
-            )}
-            <div className="home-products-content">
-              <Swiper
-                slidesPerView={2}
-                spaceBetween={30}
-                centeredSlides={true}
-                className="home-products-swiper"
-              >
-                {newProduct.map((el)=>(
-                <SwiperSlide>
+          )}
+          <div className="home-products-content">
+            <Swiper
+              slidesPerView={2}
+              spaceBetween={30}
+              centeredSlides={true}
+              className="home-products-swiper"
+            >
+              {newProduct.map((el) => (
+                <SwiperSlide key={el.id}>
                   <ProductCard product={el} />
                 </SwiperSlide>
-                ))}
-              </Swiper>
-            </div>
-          </>
-        )}
-      </div>
-    </>
+              ))}
+            </Swiper>
+          </div>
+        </>
+      )}
+    </div>
   );
 }
