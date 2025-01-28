@@ -51,7 +51,7 @@ export default function NewAddress() {
           .from("identity")
           .select("address")
           .eq("email", email)
-          .single();
+          .limit(1);
 
         if (error) {
           console.error("Error fetching address:", error);
