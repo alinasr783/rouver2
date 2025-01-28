@@ -1,0 +1,218 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.cart-content {
+  padding: 20px;
+  margin: auto;
+  max-width: 500px;
+  padding-bottom: 280px;
+  background-color: #f5f5f5; /* لون خلفية محايد */
+  font-family: "Quicksand", sans-serif;
+}
+
+.cart-content-items-content-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background-color: #ffffff; /* خلفية بيضاء نظيفة */
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cart-content-items-content-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cart-content-items-content-item img {
+  width: 80px;
+  height: 70px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid #dcdcdc;
+}
+
+.cart-item-details {
+  flex: 1;
+  margin-left: 15px;
+  text-align: left;
+}
+
+.cart-item-details h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #162D3A; /* لون النص الرئيسي */
+  font-weight: bold;
+}
+
+.cart-item-details p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #8a8a8a;
+}
+
+.cart-item-details .price {
+  font-size: 14px;
+  color: #162D3A; /* لون أزرق داكن فاتح */
+  font-weight: 600;
+}
+
+.cart-item-quantity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top:30px;
+}
+
+.cart-item-quantity button {
+  background-color: #162D3A; /* لون الزر */
+  color: white;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.cart-item-quantity button:hover {
+  background-color: #0f1c24; /* تغيير لون الزر عند التحويم */
+  transform: scale(1.05);
+}
+
+.cart-item-quantity span {
+  font-size: 16px;
+  font-weight: bold;
+  color: #162D3A;
+}
+
+.checkout-container {
+  padding: 20px;
+  margin: auto;
+  width: 88vw;
+  background-color: #fafafa;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: "Quicksand", serif;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+}
+
+.promo-code-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.promo-code-container input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #e8e8e8;
+  border-radius: 20px;
+  outline: none;
+  font-size: 14px;
+  margin-right: 10px;
+  transition: border-color 0.3s ease;
+}
+
+.promo-code-container input:focus {
+  border-color: #162D3A; /* تغير لون الحدود عند التركيز */
+}
+
+.promo-code-container button {
+  background-color: #162D3A;
+  color: white;
+  border: 2px solid #162D3A; /* إضافة حدود ملونة */
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+}
+
+.promo-code-container button:hover {
+  background-color: #0f1c24; /* تغيير اللون عند التحويم */
+  border-color: #0f1c24;
+  transform: translateY(-2px);
+}
+
+.summary {
+  text-align: left;
+  margin-bottom: 5px;
+}
+
+.summary div {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+  margin-bottom: 5px;
+  color: #162D3A;
+  font-size: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.summary div:hover {
+  background-color: #f0f0f0;
+}
+
+.summary div:last-child {
+  font-weight: bold;
+  font-size: 18px;
+  border-top: 2px dashed #e8e8e8;
+  padding-top:13px;
+}
+
+.checkout-button {
+  background-color: #162D3A;
+  color: white;
+  border: 2px solid transparent; /* جعل الحدود شفافة في البداية */
+  border-radius: 20px;
+  padding: 15px;
+  width: 100%;
+  font-size: 16px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.checkout-button:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: none;
+  border: 2px solid #162D3A; /* لون الحدود الأساسي */
+  border-radius: 20px;
+  animation: border-animation 2s infinite; /* انيميشن مستمر للحدود */
+  z-index: -1; /* لإظهار المحتوى فوق الحدود */
+}
+
+/* أنيميشن لتحريك البوردر */
+@keyframes border-animation {
+  0% {
+    border-color: #162D3A;
+  }
+  50% {
+    border-color: #0f1c24; /* تغيير لون الحدود في منتصف الدورة */
+  }
+  100% {
+    border-color: #162D3A;
+  }
+}
+.empty-cart {
+  text-align: center;
+  margin: 50px 0;
+  font-size: 20px;
+  color: #999;
+  font-weight: bold;
+}

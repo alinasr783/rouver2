@@ -1,0 +1,187 @@
+.notification-content {
+  padding: 20px;
+  font-family: "Quicksand", serif;
+  padding-bottom: 100px;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.notification.read {
+  background-color: #f5f5f5;
+  opacity: 0.7;
+}
+
+.notification:hover {
+  transform: scale(1.02);
+}
+
+.notification img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 10px;
+  border: 2px solid #ddd;
+}
+
+.notification .content {
+  flex-grow: 1;
+}
+
+.notification .title {
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.notification .message {
+  font-size: 12px;
+  color: #555;
+}
+
+.notification .time {
+  font-size: 12px;
+  color: #888;
+  margin-left: 10px;
+}
+
+.section-title span:last-child {
+  cursor: pointer;
+  color: #8b4513;
+}
+.filter-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin: 10px 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  gap: 10px;
+  overflow-x: auto;
+  white-space: nowrap; /* يمنع العناصر من الانتقال للسطر التالي */
+  scroll-behavior: smooth; /* يجعل التمرير سلسًا */
+}
+
+.filter-button {
+  padding: 10px 15px;
+  border: none;
+  background-color: #eee;
+  font-size: 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100px;
+}
+
+.filter-button.active {
+  background-color: #8b4513;
+  color: white;
+}
+
+.no-notifications {
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+  margin-top: 20px;
+}
+
+@keyframes scaleUp {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.2);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+/* خلفية الـ Popup */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4); /* خلفية شفافة */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* محتوى الـ Popup */
+.popup-content {
+  background: #fff; /* خلفية بيضاء */
+  width: 80%; /* ملاءمة العرض */
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  animation: scaleUp 0.3s ease-out;
+  font-family: "Quicksand", serif; /* نفس الخط */
+}
+
+/* العنوان */
+.popup-content h3 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #8b4513; /* لون مشابه للعنوان */
+  margin-bottom: 15px;
+}
+
+/* النص */
+.popup-content p {
+  font-size: 16px;
+  color: #704f38; /* لون مشابه للأيقونة */
+  margin-bottom: 20px;
+}
+
+/* زر التسجيل */
+.signup-btn {
+  background-color: #704f38; /* نفس لون زر الطلب */
+  color: white;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  width: 100%; /* ليملأ العرض */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.signup-btn:hover {
+  transform: scale(1.05); /* تأثير عند التمرير */
+}
+

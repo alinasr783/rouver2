@@ -1,0 +1,148 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.orders-content {
+  padding: 20px;
+  margin: auto;
+  max-width: 500px;
+  padding-bottom: 280px;
+  font-family: "Quicksand", sans-serif;
+}
+
+.orders-content-items {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.order-item {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff; /* خلفية بيضاء نظيفة */
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.order-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.order-details {
+  margin-bottom: 15px;
+}
+
+.order-details h3 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #162D3A;
+}
+
+.order-details p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #8a8a8a;
+}
+
+.order-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.order-item-product {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.order-item-product img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.order-item-details {
+  flex: 1;
+  margin-left: 15px;
+  text-align: left;
+}
+
+.order-item-details h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #162D3A;
+}
+
+.order-item-details p {
+  font-size: 12px;
+  color: #8a8a8a;
+}
+
+.order-item-details .price {
+  font-size: 14px;
+  font-weight: 600;
+  color: #162D3A;
+}
+
+.order-item-quantity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.order-item-quantity button {
+  background-color: #162D3A; /* لون الزر */
+  color: white;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.order-item-quantity button:hover {
+  background-color: #0f1c24; /* تغيير لون الزر عند التحويم */
+  transform: scale(1.05);
+}
+
+.order-item-quantity span {
+  font-size: 16px;
+  font-weight: bold;
+  color: #162D3A;
+}
+
+.empty-orders {
+  text-align: center;
+  font-size: 16px;
+  color: #162D3A;
+  margin-top: 30px;
+}
+
+.orders-content-items-items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.orders-content-items-items .order-item {
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.orders-content-items-items .order-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}

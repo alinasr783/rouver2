@@ -1,0 +1,83 @@
+.new-address-content {
+  width: 96vw;
+  height: 98%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  font-family: "Quicksand", serif;
+}
+
+.new-address-content-inputs {
+  width: 100%;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.new-address-content-inputs-input-email,
+.new-address-content-inputs-input-password {
+  width: 100%;
+  font-family: "Quicksand", serif;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.new-address-content-inputs-input-title {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.new-address-content-inputs-input-full-name input,
+.new-address-content-inputs-input-phone input {
+  width: 94%;
+  height: 50px;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  padding: 0 10px;
+  font-size: 16px;
+  font-weight: 400;
+  font-family: "Quicksand", serif;
+}
+
+.new-address-content-inputs-input-email input.error,
+.new-address-content-inputs-input-password input.error {
+  width: 94%;
+  height: 50px;
+  border-radius: 8px;
+  border: 1px solid red;
+  padding: 0 10px;
+  font-size: 16px;
+  font-weight: 400;
+  font-family: "Quicksand", serif;
+}
+
+.new-address-content-inputs-input-email input:focus,
+.new-address-content-inputs-input-password input:focus {
+  border: 1px solid #162D3A;
+}
+.new-address-content-button{
+  width: 96%;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: "Quicksand", serif;
+  border-radius: 8px;
+  border: none;
+  background: #162D3A;
+  cursor: pointer;
+  color: #fff;
+  position: fixed;
+  bottom: 10px;
+}
