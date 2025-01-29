@@ -1,12 +1,18 @@
 import Skeleton from "@mui/material/Skeleton";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+// داخل ال return
+<ToastContainer />
 import ProductHeader from "../../component/jsx/productHeader";
 import BottomHeader from "../../component/jsx/bottomHeader";
 import ProductSlider from "../../component/jsx/productSlider";
 import { WhiteCart } from "../../component/jsx/icons";
 import { supabase } from "../../lib/supabase.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { toast } from "react-toastify"; // استيراد toast لعرض الرسائل
+import "react-toastify/dist/ReactToastify.css"; // استيراد ستايل الرسائل
 import "../css/product.css";
 
 export default function Product() {
@@ -109,8 +115,7 @@ export default function Product() {
     checkProductInCart();
   }, [selectedSize, selectedColor, email, id]);
 
-
-  const handleAddToCart = async() => {
+  const handleAddToCart = async () => {
     if (selectedColor && selectedSize) {
       const productDetails = {
         id: product.id,
@@ -207,6 +212,29 @@ export default function Product() {
     }
   };
 
+  const handleOrderNow = () => {
+    if (!selectedSize || !selectedColor) {
+      toast.error("Please select both size and color before ordering", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+      });
+      return;
+    }
+
+    const orderProduct = {
+      id: product.id,
+      img: product.images[0],
+      title: product.title,
+      size: selectedSize,
+      color: selectedColor,
+      price: product.price,
+      count: 1,
+    };
+
+    navigate("/checkout", { state: { products: [orderProduct] } });
+  };
+
   if (loading) {
     return (
       <div className="loading-skeleton">
@@ -227,10 +255,6 @@ export default function Product() {
     );
   }
 
-  if (!product) {
-    return <div>Product not found!</div>;
-  }
-
   const handleToggleText = () => {
     setShowFullText((prev) => !prev);
   };
@@ -243,25 +267,6 @@ export default function Product() {
     setSelectedColor(color);
   };
 
-  const handleOrderNow = () => {
-    if (!selectedSize || !selectedColor) {
-      alert("Please select both size and color before ordering.");
-      return;
-    }
-
-    const orderProduct = {
-      id: product.id,
-      img: product.images[0],
-      title: product.title,
-      size: selectedSize,
-      color: selectedColor,
-      price: product.price,
-      count: 1,
-    };
-
-    navigate("/checkout", { state: { products: [orderProduct] } });
-  };
-    
   const maxLength = 100;
   const truncatedText =
     product.des?.length > maxLength
@@ -274,6 +279,7 @@ export default function Product() {
     <>
       <ProductHeader title={"Rouver"} product={product} />
       <ProductSlider images={product.images || []} />
+      <ToastContainer /> {/* إضافة ToastContainer هنا */}
       <div className="product-content">
         <div className="product-content-one">
           <div className="product-content-one-text">{product.category}</div>
@@ -317,7 +323,7 @@ export default function Product() {
                 key={size}
                 className={`product-content-five-select-size-btn ${
                   selectedSize === size ? "selected" : ""
-                }`}
+                } ${!selectedSize ? "required-field" : ""}`}
                 onClick={() => handleSelectSize(size)}
               >
                 {size}
@@ -333,7 +339,7 @@ export default function Product() {
                 key={index}
                 className={`color-box ${
                   selectedColor === color.color ? "selected" : ""
-                }`}
+                } ${!selectedColor ? "required-field" : ""}`}
                 onClick={() => handleSelectColor(color.color)}
               >
                 <img className="color-box-img" src={color.url} alt="Color" />
@@ -343,17 +349,16 @@ export default function Product() {
         </div>
         <div className="product-content-six">
           <div className="product-content-six-content">
-            <button 
+            <button
               className="product-content-six-content-btn"
               onClick={handleOrderNow}
             >
               Order Now
-            </button>  
+            </button>
           </div>
         </div>
       </div>
       {selectedColor && selectedSize && (
-
         <div className="product-bottom-header">
           <div className="product-bottom-header-content">
             {isProductInCart ? (
@@ -386,7 +391,7 @@ export default function Product() {
                 </div>
                 <button
                   className="product-bottom-header-content-btn"
-                  onClick={()=>{handleAddToCart()}}
+                  onClick={handleAddToCart}
                 >
                   <div
                     className="product-bottom-header-content-icon"
@@ -401,7 +406,7 @@ export default function Product() {
           </div>
         </div>
       )}
-      <BottomHeader vertical={selectedColor&&selectedSize} />
+      <BottomHeader vertical={selectedColor && selectedSize} />
     </>
   );
 }
