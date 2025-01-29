@@ -243,6 +243,25 @@ export default function Product() {
     setSelectedColor(color);
   };
 
+  const handleOrderNow = () => {
+    if (!selectedSize || !selectedColor) {
+      alert("Please select both size and color before ordering.");
+      return;
+    }
+
+    const orderProduct = {
+      id: product.id,
+      img: product.images[0],
+      title: product.title,
+      size: selectedSize,
+      color: selectedColor,
+      price: product.price,
+      count: 1,
+    };
+
+    navigate("/checkout", { state: { products: [orderProduct] } });
+  };
+    
   const maxLength = 100;
   const truncatedText =
     product.des?.length > maxLength
@@ -320,6 +339,16 @@ export default function Product() {
                 <img className="color-box-img" src={color.url} alt="Color" />
               </div>
             ))}
+          </div>
+        </div>
+        <div className="product-content-six">
+          <div className="product-content-six-content">
+            <button 
+              className="product-content-six-content-btn"
+              onClick={handleOrderNow}
+            >
+              Order Now
+            </button>  
           </div>
         </div>
       </div>
