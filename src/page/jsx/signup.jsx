@@ -1,6 +1,6 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {supabase} from "../../lib/supabase.js";
+import { supabase } from "../../lib/supabase.js";
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
@@ -39,32 +39,36 @@ export default function Signup() {
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      createUserColumn()
-      createIdentityColumn()
+      await createUserColumn();
       navigate('/'); 
     } catch (err) {
-      if (err.code === 'auth/email-already-in-use') {
-        setError("Email already exists.");
-      } else if (err.code === 'auth/weak-password') {
-        setError("Password is too weak.");
-      } else {
-        setError("Unexpected error occurred.");
-      }
+      handleFirebaseError(err);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleFirebaseError = (err) => {
+    switch (err.code) {
+      case 'auth/email-already-in-use':
+        setError("Email already exists.");
+        break;
+      case 'auth/weak-password':
+        setError("Password is too weak.");
+        break;
+      default:
+        setError("Unexpected error occurred.");
+    }
+  };
+
   const createUserColumn = async () => {
     try {
-      // الوظيفة العامة لإضافة بيانات إلى الجداول المختلفة
       const insertIntoTable = async (tableName) => {
         const { data, error } = await supabase.from(tableName).insert([{ email }]);
         if (error) throw new Error(`Error inserting into ${tableName} table: ${error.message}`);
         return data;
       };
 
-      // إدراج البيانات في الجداول المطلوبة
       await Promise.all([
         insertIntoTable("user"),
         insertIntoTable("identity"),
@@ -78,27 +82,16 @@ export default function Signup() {
     }
   };
 
-  const createIdentityColumn = async () => {
-    const { data, error } = await supabase
-      .from('identity')
-      .insert([
-        { email: email } 
-      ]);
-
-    if (error) {
-      console.error('Error inserting data:', error);
-    } else {
-      console.log('Data inserted successfully:', data);
-    }
-  }
   return (
     <div className='signup'>
       <div className='signup-content'>
         <div className='signup-content-img'>
           <img src="https://i.ibb.co/vDZcMPF/photo-1574182245530-967d9b3831af.jpg" alt="Signup" />
         </div>
-        <div className='signup-content-title'>YOUR ROUVER</div>
-        <div className='signup-content-des'>Here, we create what you can imagine [hello you]</div>
+        <div className='signup-content-title'>Trendy man بتحبك ❤️ </div>
+        <div className='signup-content-des'>عامل اي يا عسل 😘
+        عشان تسجل معانا محتاجين شوية بيانات صغننة قد كدا 🤏🏻 
+        </div>
         <div className='signup-content-inputs'>
           <div className='signup-content-inputs-input-email'>
             <div className='signup-content-inputs-input-title'>Email</div>
@@ -124,15 +117,15 @@ export default function Signup() {
             </div>
           </div>
         </div>
-        <div className='signup-content-button' onClick={handleSubmit}>
+        <button className='signup-content-button' onClick={handleSubmit}>
           {loading ? <CircularIndeterminate /> : "Create Account"}
-        </div>
-        <div className="signup-content-login">
-          Already have an account? <a onClick={() => navigate("/login")}>Login</a>
-        </div>
-        <div className='signup-content-rights'>
-          <p>&copy; 2025 ROUVER. All Rights Reserved.</p>
-        </div>
+        </button>
+        <button className="signup-content-login" onClick={() => navigate("/login")}>
+          Already have an account? <a >Login</a>
+        </button>
+        {/* <div className='signup-content-rights'>
+          <p></p>
+        </div> */}
       </div>
     </div>
   );

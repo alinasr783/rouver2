@@ -120,7 +120,10 @@ export default function ProductCard({ product, slide }) {
   };
 
   return (
-    <div className="product-card" onClick={() => navigate(`/product/${product.id}`)}>
+    <div
+      className="product-card"
+      onClick={() => navigate(`/product/${product.id}`)}
+    >
       {loading ? (
         <Skeleton variant="rectangular" width="100%" height={200} />
       ) : (
@@ -129,7 +132,10 @@ export default function ProductCard({ product, slide }) {
             {slide ? (
               <Swiper className="product-card-content-sliders">
                 {product.images.map((el, ind) => (
-                  <SwiperSlide className="product-card-content-slider" key={ind}>
+                  <SwiperSlide
+                    className="product-card-content-slider"
+                    key={ind}
+                  >
                     <img src={el} alt={`Product ${ind}`} />
                   </SwiperSlide>
                 ))}
@@ -148,7 +154,20 @@ export default function ProductCard({ product, slide }) {
             </div>
           </div>
           <div className="product-card-content-bottom">
-            <div className="product-card-content-price">${product.price}</div>
+            <div className="product-card-content-price">
+              {product.discount ? (
+                <>
+                  <del className="product-card-content-old-price">
+                    {product.discount} EGP
+                  </del>
+                  <span className="product-card-content-new-price">
+                    {product.price} EGP
+                  </span>
+                </>
+              ) : (
+                <span>{product.price} EGP</span>
+              )}
+            </div>
           </div>
           <div className="product-card-content-heart" onClick={handleHeart}>
             <div

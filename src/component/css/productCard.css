@@ -96,3 +96,24 @@
 .product-card-content-slider img{
   z-index:-2 !important;
 }
+.product-card-content-price {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.product-card-content-old-price {
+  font-size: 14px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.product-card-content-new-price {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e74c3c; /* لون أحمر لجذب الانتباه للسعر الجديد */
+}

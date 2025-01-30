@@ -63,7 +63,7 @@ export default function HomeProducts() {
         <Skeleton variant="rounded" width="98%" height={230} />
       ) : (
         <>
-          <div className="home-products-title">Products</div>
+          <div className="home-products-title">جديد ✨</div>
           <div className="home-products-content">
             {product.slice(0, 4).map((prod, index) => (
               <ProductCard key={prod.id} product={prod} slide={true} />
@@ -72,7 +72,7 @@ export default function HomeProducts() {
 
           {best_price.length > 0 && (
             <>
-              <div className="home-products-title">Best Price</div>
+              <div className="home-products-title">ترندات 2025 😎</div>
               <div className="home-products-content">
                 <Swiper
                   effect="cube"
@@ -105,7 +105,7 @@ export default function HomeProducts() {
 
           {top_rating.length > 0 && (
             <>
-              <div className="home-products-title">Top Rating</div>
+              <div className="home-products-title">خصومات مش هتكرر 🔥</div>
               <div className="home-products-content">
                 {top_rating.map((el) => (
                   <ProductCard key={el.id} product={el} slide={true} />
@@ -115,7 +115,7 @@ export default function HomeProducts() {
           )}
 
           {newProduct.length > 0 && (
-            <div className="home-products-title">Look at here</div>
+            <div className="home-products-title">اعلي التقيمات 💯</div>
           )}
           <div className="home-products-content">
             <Swiper

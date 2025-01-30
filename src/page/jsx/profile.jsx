@@ -168,10 +168,10 @@ export default function Profile() {
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
-            <h3>Sign Up Now!</h3>
-            <p>Create an account to access your profile and get exclusive offers.</p>
+            <h3>🫶 اهلا بيك معانا</h3>
+            <p>سجل حساب دوقتي و استمتع بي  أفضل العروض والخصومات قبل اي حد ❤️</p>
             <button onClick={handleSignUp} className="signup-btn">
-              Sign Up Now
+               🔥 سجل دلوقتي
             </button>
           </div>
         </div>

@@ -4,7 +4,7 @@
 }
 .signup{
   width: 100vw;
-  height: 100vh;
+  height: 120vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -121,6 +121,8 @@
   font-family: "Quicksand", serif;
   color: #162D3A;
   cursor: pointer;
+  border:none;
+  background: none;
 }
 .signup-content-login a{
   text-decoration: underline;
@@ -137,7 +139,8 @@
   font-weight: 400;
   font-family: "Quicksand", serif;
   position : absolute;
-  bottom: 0;
+  bottom: 5px;
+  left : 50%;
 }
 .signup-content-inputs-input-error{
   width: 100%;

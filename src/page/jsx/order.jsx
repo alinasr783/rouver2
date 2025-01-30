@@ -11,10 +11,10 @@ import Skeleton from "@mui/material/Skeleton";
 import "../css/order.css";
 
 const steps = [
-  "Order Read",
-  "Order Under Review",
-  "Order In Transit",
-  "Order Delivered",
+  "استني مكالمة خدمة العملاء ✨",
+  "يتم تجهيز الاوردر 🌝",
+  "جايلك في السكة 🥺",
+  "وصل بسلامة 🥳",
 ];
 
 export default function Order() {
@@ -74,7 +74,7 @@ export default function Order() {
               <>
                 <div className="order-steper">
                   <div className="order-steper-content">
-                    <div className="order-steper-content-title">Order Status</div>
+                    <div className="order-steper-content-title">حالة التوصيل  🚀</div>
                     <div className="order-steper-content-steps">
                       <Box sx={{ width: "80%" }}>
                         <Stepper

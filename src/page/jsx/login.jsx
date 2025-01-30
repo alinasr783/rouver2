@@ -45,6 +45,9 @@ export default function Login() {
       setLoading(false);
     }
   };
+  const handleSignUp = () => {
+    navigate("/signup")
+  }
 
   return (
     <div className="login">
@@ -52,9 +55,10 @@ export default function Login() {
         <div className="login-content-img">
           <img src="https://i.ibb.co/vDZcMPF/photo-1574182245530-967d9b3831af.jpg" alt="Login" />
         </div>
-        <div className="login-content-title">Welcome Back</div>
+        <div className="login-content-title">🤍 اهلا يا عسل</div>
         <div className="login-content-des">
-          Here, we create what you can imagine [hello you]
+          اليومين دول في حالات انتحال للشخصيات المهمة والعظيمة زيك😎  
+          عشان كدا  عايزينك تدخل بيانات حسابك عشان نتأكد ان محدش بيحاول ينتحل شخصيتك 🧐
         </div>
         <div className="login-content-inputs">
           <div className="login-content-inputs-input-email">
@@ -82,16 +86,16 @@ export default function Login() {
             </div>
           </div>
         </div>
-        <div className="login-content-button" onClick={handleSubmit}>
+        <button className="login-content-button" onClick={handleSubmit}>
           {loading ? <CircularIndeterminate /> : "Login"}
-        </div>
-        <div className="login-content-login">
+        </button>
+        <button className="login-content-login" onClick={handleSignUp}>
           Don't have an account?{" "}
-          <a onClick={() => navigate("/signup")}>Sign Up</a>
-        </div>
-        <div className="login-content-rights">
-          <p>&copy; 2025 ROUVER. All Rights Reserved.</p>
-        </div>
+          <a >Sign Up</a>
+        </button>
+        {/* <div className="login-content-rights">
+          <p></p>
+        </div> */}
       </div>
     </div>
   );

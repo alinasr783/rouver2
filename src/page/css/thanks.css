@@ -24,11 +24,19 @@
   color: #704f38;
 }
 
-.order-success-message h2 {
-  font-size: 24px;
-  font-weight: bold;
+.order-success-message {
+  width:90%;
+  direction: rtl; /* لتأكيد أن النص يبدأ من اليمين */
+  font-family: 'Arial', sans-serif; /* خط أكثر وضوحاً */
+  line-height: 1.6; /* زيادة المسافة بين الأسطر */
+}
+
+.order-success-message p {
+  font-size: 18px;
+  font-weight: 600;
+  text-align: right;
   color: #8b4513;
-  margin-top: 0px;
+  margin: 10px 0; /* تعديل الهامش بين الفقرات */
   animation: fadeIn 1s ease-out;
 }
 
