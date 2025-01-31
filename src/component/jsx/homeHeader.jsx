@@ -127,7 +127,7 @@ export default function HomeHeader() {
           <Skeleton variant="text" width="80%" height="100%" />
         ) : (
       <div className="home-header-content-greeting" dir="rtl">
-        {userData.greeting}{userData.name && `، ${userData.name}`}
+        {userData.greeting}{userData.name ?`، ${userData.name}` : ""}
       </div>
         )}
 
