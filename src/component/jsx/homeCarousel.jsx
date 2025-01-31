@@ -13,27 +13,41 @@ export default function HomeCarousel() {
   const navigate = useNavigate();
   const [sliders, setSliders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const getSliders = async () => {
-    const { data, error } = await supabase.from("slider").select("*");
-
-    if (error) {
-      console.error("Error fetching sliders:", error);
-    } else {
+  const fetchSliders = async () => {
+    try {
+      const { data, error } = await supabase.from("slider").select("*");
+      if (error) throw error;
       setSliders(data);
+    } catch (err) {
+      setError(err.message);
+      console.error("Slider fetch error:", err);
+    } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    getSliders();
+    fetchSliders();
   }, []);
+
+  const handleSlideClick = (link) => {
+    if (link) navigate(`/${link}`);
+  };
+
+  if (error) return <div className="carousel-error">Error loading slides</div>;
 
   return (
     <div className="home-carousel">
       <div className="home-carousel-content">
         {loading ? (
-          <Skeleton variant="rounded" width="98%" height={230} />
+          <Skeleton 
+            variant="rounded" 
+            width="98%" 
+            height={230} 
+            sx={{ borderRadius: 2 }}
+          />
         ) : (
           <Swiper
             effect="cube"
@@ -41,8 +55,6 @@ export default function HomeCarousel() {
             cubeEffect={{
               shadow: false,
               slideShadows: false,
-              shadowOffset: 20,
-              shadowScale: 0.94,
             }}
             pagination={{
               clickable: true,
@@ -52,11 +64,17 @@ export default function HomeCarousel() {
             className="home-carousel-content-swiper"
           >
             {sliders.map((slider, index) => (
-              <SwiperSlide key={index} onClick={()=>{navigate(`/${slider.link}`)}}>
+              <SwiperSlide 
+                key={slider.id || index}
+                onClick={() => handleSlideClick(slider.link)}
+                role="button"
+                tabIndex={0}
+              >
                 <img
-                  src={slider.image} // استخدم الحقل الذي يحتوي على رابط الصورة
-                  alt={`Slide ${index + 1}`}
+                  src={slider.image}
+                  alt={`Slide: ${slider.title || index + 1}`}
                   className="home-carousel-img"
+                  loading="lazy"
                 />
               </SwiperSlide>
             ))}

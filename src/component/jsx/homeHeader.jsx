@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase.js";
 import Badge from "@mui/material/Badge";
@@ -7,123 +7,118 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import "@fortawesome/fontawesome-free/css/all.css";
 import "../css/homeHeader.css";
 
-export default function HomeHeader({ searchMode }) {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [greeting, setGreeting] = useState("");
+const GREETINGS = {
+  morning: [
+    "صباح الفل 🌞",
+    "يوم جديد وفرصة جديدة ☀️",
+    "اصحى وانطلق 🚀",
+    "ابدأ يومك بطاقة حلوة 💪",
+    "خليك متفائل 🌻"
+  ],
+  afternoon: [
+    "كمل بقوة 🔥",
+    "ريح شوية وكمل ⚡",
+    "خطوة تقربك لهدفك 🎯",
+    "اشحن طاقتك 💡",
+    "وقت الإنجاز 🚀"
+  ],
+  evening: [
+    "مساء الخير 🌙",
+    "خد لحظة لنفسك 🌅",
+    "وقت الاسترخاء 🏆",
+    "طاقة إيجابية 🌌",
+    "يومك كان رائع 🕊️"
+  ],
+  night: [
+    "ليلة هادية 🌃",
+    "نام كويس 🛌",
+    "أحلام سعيدة 🌠",
+    "استعد لبكرة 🔥",
+    "راحة واستجمام 🌖"
+  ],
+};
+
+export default function HomeHeader() {
+  const [userData, setUserData] = useState({
+    name: "",
+    unreadCount: 0,
+    greeting: ""
+  });
   const [loading, setLoading] = useState(true);
-  const [unreadCount, setUnreadCount] = useState(0); // عدد الإشعارات غير المقروءة
   const navigate = useNavigate();
 
-  const getGreeting = () => {
-    const greetings = {
-      morning: ["Good morn", "Rise & shine", "Top morning"],
-      afternoon: ["Good day", "Hey there", "Lovely noon"],
-      evening: ["Good eve", "Nice night", "Evening joy"],
-      night: ["Sweet dreams", "Night vibes", "Good night"],
-    };
+  const getGreeting = useCallback(() => {
+    const hour = new Date().getHours();
+    let timePeriod = "morning";
 
-    const now = new Date();
-    const hour = now.getHours();
-    let timePeriod;
+    if (hour >= 5 && hour < 12) timePeriod = "morning";
+    else if (hour >= 12 && hour < 17) timePeriod = "afternoon";
+    else if (hour >= 17 && hour < 22) timePeriod = "evening";
+    else timePeriod = "night";
 
-    if (hour >= 5 && hour < 12) {
-      timePeriod = "morning";
-    } else if (hour >= 12 && hour < 17) {
-      timePeriod = "afternoon";
-    } else if (hour >= 17 && hour < 22) {
-      timePeriod = "evening";
-    } else {
-      timePeriod = "night";
-    }
+    return GREETINGS[timePeriod][
+      Math.floor(Math.random() * GREETINGS[timePeriod].length)
+    ];
+  }, []);
 
-    const periodGreetings = greetings[timePeriod];
-    const randomIndex = Math.floor(Math.random() * periodGreetings.length);
-    setGreeting(periodGreetings[randomIndex]);
-    setLoading(false);
-  };
-
-  const getName = async (userEmail) => {
-    // التحقق من وجود الاسم في الـ localStorage
-    const localName = localStorage.getItem("first_name");
-    if (localName) {
-      setName(localName);
-      setLoading(false);
-      return;
-    }
-
+  const fetchData = useCallback(async (email) => {
     try {
-      const { data, error } = await supabase
-        .from("identity")
-        .select("first_name")
-        .eq("email", userEmail)
-        .single();
-      if (error) throw error;
+      const [localName, localCount] = [
+        localStorage.getItem("first_name"),
+        parseInt(localStorage.getItem("unread_notifications_count"), 10)
+      ];
 
-      setName(data.first_name);
+      setUserData(prev => ({
+        ...prev,
+        name: localName || "",
+        unreadCount: localCount || 0
+      }));
 
-      // حفظ الاسم في الـ localStorage
-      localStorage.setItem("first_name", data.first_name);
+      if (email) {
+        const [nameRes, notificationsRes] = await Promise.all([
+          localName && supabase
+            .from("identity")
+            .select("first_name")
+            .eq("email", email)
+            .single(),
+
+          supabase
+            .from("notification")
+            .select("id", { count: "exact" })
+            .eq("email", email)
+            .eq("is_read", false)
+        ]);
+
+        if (nameRes && nameRes.data && localName) {
+          const newName = nameRes.data.first_name || "";
+          localStorage.setItem("first_name", newName);
+          setUserData(prev => ({ ...prev, name: newName }));
+        }
+
+        if (notificationsRes) {
+          const newCount = notificationsRes.count || 0;
+          localStorage.setItem("unread_notifications_count", newCount);
+          setUserData(prev => ({ ...prev, unreadCount: newCount }));
+        }
+      }
     } catch (error) {
-      console.error("Error fetching user name:", error.message);
-      setName(""); // لا يوجد اسم، سيتم عرض التحية فقط
+      console.error("Error fetching data:", error.message);
     } finally {
       setLoading(false);
     }
-  };
-
-  const getUnreadNotificationsCount = async (userEmail) => {
-    const localUnreadCount = localStorage.getItem("unread_notifications_count");
-
-    if (localUnreadCount) {
-      // إذا كان هناك بيانات في الـ localStorage، استخدمها وحدّث الحالة
-      setUnreadCount(parseInt(localUnreadCount, 10));
-      setLoading(false); // تحديث حالة التحميل
-      return;
-    }
-
-    try {
-      const { count, error } = await supabase
-        .from("notification")
-        .select("id", { count: "exact" })
-        .eq("email", userEmail)
-        .eq("is_read", false);
-
-      if (error) throw error;
-
-      setUnreadCount(count);
-
-      // حفظ عدد الإشعارات غير المقروءة في الـ localStorage
-      localStorage.setItem("unread_notifications_count", count);
-    } catch (error) {
-      console.error("Error fetching unread notifications count:", error.message);
-    } finally {
-      setLoading(false); // تأكد من تحديث حالة التحميل حتى إذا حدث خطأ
-    }
-  };
+  }, []);
 
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setEmail(user.email);
-        getName(user.email);
-        getUnreadNotificationsCount(user.email); // جلب عدد الإشعارات غير المقروءة
-      } else {
-        setEmail(null);
-        setName(""); // لا يوجد مستخدم، عرض التحية فقط
-        setLoading(false)
-      }
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      const greeting = getGreeting();
+      setUserData(prev => ({ ...prev, greeting }));
+
+      await fetchData(user?.email);
     });
 
     return () => unsubscribe();
-  }, [navigate]);
-
-  useEffect(() => {
-    if (!loading) {
-      getGreeting();
-    }
-  }, [loading]);
+  }, [fetchData, getGreeting]);
 
   return (
     <div className="home-header">
@@ -131,10 +126,11 @@ export default function HomeHeader({ searchMode }) {
         {loading ? (
           <Skeleton variant="text" width="80%" height="100%" />
         ) : (
-          <div className="home-header-content-greeting">
-            {greeting} {name && name}
-          </div>
+      <div className="home-header-content-greeting" dir="rtl">
+        {userData.greeting}{userData.name && `، ${userData.name}`}
+      </div>
         )}
+
         <div className="home-header-content-notification">
           {loading ? (
             <Skeleton variant="circular" width={45} height={45} />
@@ -144,7 +140,7 @@ export default function HomeHeader({ searchMode }) {
               onClick={() => navigate("/notification")}
             >
               <Badge
-                badgeContent={unreadCount}
+                badgeContent={userData.unreadCount}
                 sx={{
                   "& .MuiBadge-badge": {
                     color: "#f4f4f4",

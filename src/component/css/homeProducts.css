@@ -32,12 +32,14 @@
   font-size: 28px;
   font-weight: 600;
   margin: 5px 0;
-  text-align: left;
   white-space: nowrap;
   overflow: hidden;
   color: #233; /* اللون الافتراضي */
   border-right: 2px solid #333; /* الخط الوامض */
   animation: typing 2s steps(22) 1s forwards, blink 0.5s step-end infinite, colorChange 10s linear infinite;
+  text-align: right;
+  direction: rtl;
+  margin-top: 20px;
 }
 
 /* تأثير الكتابة */

@@ -556,33 +556,39 @@ export default function Product() {
             </button>
           </div>
         </div>
-          <div className="product-content-seven">
-            <div className="product-content-seven-content">
-              <div className="product-content-seven-content-title">
-                أشتري دول مع بعض
-              </div>
-              <div className="product-content-seven-content-cards">
-                <ProductCard key={product.id} product={product} slide={true} />
-                <ProductCard key={reProduct.id} product={reProduct} slide={true} />
-              </div>
-              <div className="product-content-seven-btn">
-                <div className="product-content-seven-content">
-                  <button
-                    className="product-content-seven-content-btn"
-                    onClick={handle2OrderNow}
-                  >
-                    Order Now by {rePrice} EGP
-                  </button>
-                </div>
+        {reProduct &&(
+
+        <div className="product-content-seven">
+          <div className="product-content-seven-content">
+            <div className="product-content-seven-content-title">
+              أشتري دول مع بعض
+            </div>
+            <div className="product-content-seven-content-cards">
+              <div className="product-content-seven-content-card">
+              <ProductCard key={product.id} product={product} slide={true} />
+              <i className="fa fa-plus"></i>
+              <ProductCard key={reProduct.id} product={reProduct} slide={true} />
+            </div>
+            </div>
+            <div className="product-content-seven-btn">
+              <div className="product-content-seven-content">
+                <button
+                  className="product-content-seven-content-btn-2"
+                  onClick={handle2OrderNow}
+                >
+                  Order Now by {rePrice} EGP
+                </button>
               </div>
             </div>
-            {showPopup && (
-              <Popup
-                onClose={() => setShowPopup(false)}
-                onProceed={handleProceedToCheckout}
-              />
-            )}
           </div>
+          {showPopup && (
+            <Popup
+              onClose={() => setShowPopup(false)}
+              onProceed={handleProceedToCheckout}
+            />
+          )}
+        </div>
+        )}
       </div>
       {selectedColor && selectedSize && (
         <div className="product-bottom-header">
