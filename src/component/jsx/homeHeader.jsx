@@ -7,47 +7,34 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import "@fortawesome/fontawesome-free/css/all.css";
 import "../css/homeHeader.css";
 
-const GREETINGS = {
-  morning: [
-    "صباح الفل 🌞",
-    "يوم جديد وفرصة جديدة ☀️",
-    "اصحى وانطلق 🚀",
-    "ابدأ يومك بطاقة حلوة 💪",
-    "خليك متفائل 🌻"
-  ],
-  afternoon: [
-    "كمل بقوة 🔥",
-    "ريح شوية وكمل ⚡",
-    "خطوة تقربك لهدفك 🎯",
-    "اشحن طاقتك 💡",
-    "وقت الإنجاز 🚀"
-  ],
-  evening: [
-    "مساء الخير 🌙",
-    "خد لحظة لنفسك 🌅",
-    "وقت الاسترخاء 🏆",
-    "طاقة إيجابية 🌌",
-    "يومك كان رائع 🕊️"
-  ],
-  night: [
-    "ليلة هادية 🌃",
-    "نام كويس 🛌",
-    "أحلام سعيدة 🌠",
-    "استعد لبكرة 🔥",
-    "راحة واستجمام 🌖"
-  ],
-};
-
 export default function HomeHeader() {
   const [userData, setUserData] = useState({
     name: "",
     unreadCount: 0,
     greeting: ""
   });
+
+  const [greetings, setGreetings] = useState(null); // لتخزين التحيات من Supabase
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // **جلب التحيات من Supabase**
+  const fetchGreetings = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.from("setting").select("greeting").single();
+      if (error) throw error;
+      if (data?.greeting) {
+        setGreetings(data.greeting); // تعيين التحيات بعد جلبها
+      }
+    } catch (error) {
+      console.error("Error fetching greetings:", error.message);
+    }
+  }, []);
+
+  // **تحديد التحية المناسبة حسب التوقيت**
   const getGreeting = useCallback(() => {
+    if (!greetings) return "";
+
     const hour = new Date().getHours();
     let timePeriod = "morning";
 
@@ -56,11 +43,10 @@ export default function HomeHeader() {
     else if (hour >= 17 && hour < 22) timePeriod = "evening";
     else timePeriod = "night";
 
-    return GREETINGS[timePeriod][
-      Math.floor(Math.random() * GREETINGS[timePeriod].length)
-    ];
-  }, []);
+    return greetings[timePeriod]?.[Math.floor(Math.random() * greetings[timePeriod].length)] || "";
+  }, [greetings]);
 
+  // **جلب بيانات المستخدم من Supabase**
   const fetchData = useCallback(async (email) => {
     try {
       const [localName, localCount] = [
@@ -109,16 +95,22 @@ export default function HomeHeader() {
   }, []);
 
   useEffect(() => {
+    fetchGreetings(); // جلب التحيات عند تحميل الصفحة
+  }, [fetchGreetings]);
+
+  useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      const greeting = getGreeting();
-      setUserData(prev => ({ ...prev, greeting }));
+      if (greetings) {
+        const greeting = getGreeting();
+        setUserData(prev => ({ ...prev, greeting }));
+      }
 
       await fetchData(user?.email);
     });
 
     return () => unsubscribe();
-  }, [fetchData, getGreeting]);
+  }, [fetchData, getGreeting, greetings]);
 
   return (
     <div className="home-header">
@@ -126,9 +118,9 @@ export default function HomeHeader() {
         {loading ? (
           <Skeleton variant="text" width="80%" height="100%" />
         ) : (
-      <div className="home-header-content-greeting" dir="rtl">
-        {userData.greeting}{userData.name ?`، ${userData.name}` : ""}
-      </div>
+          <div className="home-header-content-greeting" dir="rtl">
+            {userData.greeting}{userData.name ? `، ${userData.name}` : ""}
+          </div>
         )}
 
         <div className="home-header-content-notification">

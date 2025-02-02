@@ -7,7 +7,6 @@ import ProductCard from "../../component/jsx/productCard.jsx";
 import ProductHeader from "../../component/jsx/productHeader";
 import BottomHeader from "../../component/jsx/bottomHeader";
 import ProductSlider from "../../component/jsx/productSlider";
-import HomeProducts from "../../component/jsx/homeProducts.jsx";
 import { WhiteCart } from "../../component/jsx/icons";
 import { supabase } from "../../lib/supabase.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -639,7 +638,6 @@ export default function Product() {
           </div>
         </div>
       )}
-      <HomeProducts />
       <BottomHeader vertical={selectedColor && selectedSize} />
       <ToastContainer />
     </>

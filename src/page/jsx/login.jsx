@@ -1,5 +1,6 @@
-import React, { useState,useEffect } from "react";
+import React, { useState,useEffect,useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../../lib/supabase.js";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
@@ -16,13 +17,15 @@ function CircularIndeterminate() {
 
 export default function Login() {
   useEffect(() => {
-    window.scrollTo(0, 0); // التمرير إلى أعلى نقطة في الصفحة
+    window.scrollTo(0, 0); 
+    fetchGreetings();
   }, []); // [] لضمان تنفيذها مرة واحدة فقط عند التحميل
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [img, setImg] = useState(null);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -45,6 +48,17 @@ export default function Login() {
       setLoading(false);
     }
   };
+  const fetchGreetings = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.from("setting").select("*").single();
+      if (error) throw error;
+      if (data?.login_img) {
+        setImg(data.login_img); // تعيين التحيات بعد جلبها
+      }
+    } catch (error) {
+      console.error("Error fetching greetings:", error.message);
+    }
+  }, []);
   const handleSignUp = () => {
     navigate("/signup")
   }
@@ -53,7 +67,7 @@ export default function Login() {
     <div className="login">
       <div className="login-content">
         <div className="login-content-img">
-          <img src="https://i.ibb.co/vDZcMPF/photo-1574182245530-967d9b3831af.jpg" alt="Login" />
+          <img src={`${img}`} alt="Login" />
         </div>
         <div className="login-content-title">🤍 اهلا يا عسل</div>
         <div className="login-content-des">

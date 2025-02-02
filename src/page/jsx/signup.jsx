@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "../../lib/supabase.js";
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
@@ -22,10 +22,24 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [img, setImg] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0); // التمرير إلى أعلى نقطة في الصفحة
+    fetchGreetings();
   }, []); // [] لضمان تنفيذها مرة واحدة فقط عند التحميل
+
+  const fetchGreetings = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.from("setting").select("*").single();
+      if (error) throw error;
+      if (data?.signup_img) {
+        setImg(data.signup_img); // تعيين التحيات بعد جلبها
+      }
+    } catch (error) {
+      console.error("Error fetching greetings:", error.message);
+    }
+  }, []);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -86,7 +100,7 @@ export default function Signup() {
     <div className='signup'>
       <div className='signup-content'>
         <div className='signup-content-img'>
-          <img src="https://i.ibb.co/vDZcMPF/photo-1574182245530-967d9b3831af.jpg" alt="Signup" />
+          <img src={`${img}`} alt={`${img}`} />
         </div>
         <div className='signup-content-title'>Trendy man بتحبك ❤️ </div>
         <div className='signup-content-des'>عامل اي يا عسل 😘
