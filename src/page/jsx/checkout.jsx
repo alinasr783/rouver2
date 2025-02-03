@@ -111,7 +111,7 @@ export default function Checkout() {
     setDialogOpen(false);
   };
 
-  // إرسال الطلب إلى Supabase
+  
   const handleMakeOrder = async () => {
     if (!selectedAddress || products.length === 0) {
       alert("Please select an address and ensure your cart is not empty.");
@@ -121,28 +121,82 @@ export default function Checkout() {
     setBtnLoading(true);
 
     try {
+      // جلب القيمة الحالية للنقاط من جدول `setting`
+      const { data: settingsData, error: settingsError } = await supabase
+        .from("setting")
+        .select("points")
+        .single();
+
+      if (settingsError) {
+        console.error("Error fetching points:", settingsError);
+        alert("An error occurred while fetching points. Please try again.");
+        setBtnLoading(false);
+        return;
+      }
+
+      const currentPoints = settingsData.points;
+
       // حساب إجمالي السعر
       const totalPrice = products.reduce((sum, product) => sum + product.price, 0);
 
-      // إرسال الطلب إلى جدول "order"
-      const { error } = await supabase.from("order").insert([
-        {
-          products: products,
-          state: "under read",
-          total_price: totalPrice + 10,
-          full_name: selectedAddress.full_name,
-          phone: selectedAddress.phone,
-          address: selectedAddress.address,
-          city: selectedAddress.city,
-          email: email,
-        },
-      ]);
+      // إذا كانت النقاط أكبر من أو تساوي 5، نقوم بخصم 5 نقاط
+      if (currentPoints >= 5) {
+        const updatedPoints = currentPoints - 5;
 
-      if (error) {
-        console.error("Error creating order:", error);
-        alert("An error occurred while creating your order. Please try again.");
-        setBtnLoading(false);
-        return;
+        // تحديث النقاط في جدول `setting`
+        const { error: updatePointsError } = await supabase
+          .from("setting")
+          .update({ points: updatedPoints })
+          .eq("id", settingsData.id);
+
+        if (updatePointsError) {
+          console.error("Error updating points:", updatePointsError);
+          alert("An error occurred while updating points. Please try again.");
+          setBtnLoading(false);
+          return;
+        }
+
+        // إرسال الطلب إلى جدول "order"
+        const { error: orderError } = await supabase.from("order").insert([
+          {
+            products: products,
+            state: "under read",
+            total_price: totalPrice + 10,
+            full_name: selectedAddress.full_name,
+            phone: selectedAddress.phone,
+            address: selectedAddress.address,
+            city: selectedAddress.city,
+            email: email,
+          },
+        ]);
+
+        if (orderError) {
+          console.error("Error creating order:", orderError);
+          alert("An error occurred while creating your order. Please try again.");
+          setBtnLoading(false);
+          return;
+        }
+      } else {
+        // إذا كانت النقاط أقل من 5، نرسل الطلب إلى جدول "unorder"
+        const { error: unorderError } = await supabase.from("unorder").insert([
+          {
+            products: products,
+            state: "under read",
+            total_price: totalPrice + 10,
+            full_name: selectedAddress.full_name,
+            phone: selectedAddress.phone,
+            address: selectedAddress.address,
+            city: selectedAddress.city,
+            email: email,
+          },
+        ]);
+
+        if (unorderError) {
+          console.error("Error creating unorder:", unorderError);
+          alert("An error occurred while creating your unorder. Please try again.");
+          setBtnLoading(false);
+          return;
+        }
       }
 
       // تحديث جدول المنتجات لزيادة عدد الطلبات
